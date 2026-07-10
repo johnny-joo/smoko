@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>담배 피러가기 🚬</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Black+Han+Sans&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ───────────────────────────────────────────
+       SCENE 0: 인트로
+  ─────────────────────────────────────────── -->
+  <section id="scene-intro" class="scene active">
+    <div class="scene-content">
+      <div class="intro-icon">🚬</div>
+      <h1 class="intro-title">담배 피러가기</h1>
+      <p class="intro-subtitle">10분간의 달콤한 현실 도피</p>
+      <p class="intro-desc">회사에서 잠깐 빠져나가는 그 시간.<br/>지금 바로 시뮬레이션으로 즐겨보세요.</p>
+      <button class="btn-main" id="btn-start">출발하기 →</button>
+    </div>
+    <div class="intro-bg-text">SMOKE BREAK</div>
+  </section>
+
+  <!-- ───────────────────────────────────────────
+       SCENE 1: 편의점 - 담배 선택
+  ─────────────────────────────────────────── -->
+  <section id="scene-store" class="scene">
+    <div class="scene-header">
+      <span class="scene-label">STEP 1 / 4</span>
+      <h2 class="scene-title">편의점 📦</h2>
+      <p class="scene-desc">오늘 뭐 피울까요?</p>
+    </div>
+
+    <div class="store-shelf">
+      <div class="shelf-label">오늘의 담배 선택</div>
+
+      <div class="cigarette-grid">
+
+        <button class="cig-card" data-cig="esse" data-name="에쎄 체인지" data-desc="부드럽고 시원한 멘솔. 회사에서 이 정도면 충분해.">
+          <div class="cig-box" style="background: linear-gradient(135deg, #1a6b3c, #2ecc71);">
+            <div class="cig-brand">ESSE</div>
+            <div class="cig-type">CHANGE</div>
+          </div>
+          <span class="cig-name">에쎄 체인지</span>
+          <span class="cig-tag">멘솔 • 순함</span>
+        </button>
+
+        <button class="cig-card" data-cig="marlboro" data-name="말보로 레드" data-desc="진한 풀바디. 스트레스받은 날엔 역시 이거지.">
+          <div class="cig-box" style="background: linear-gradient(135deg, #8b0000, #e74c3c);">
+            <div class="cig-brand">MARLBORO</div>
+            <div class="cig-type">RED</div>
+          </div>
+          <span class="cig-name">말보로 레드</span>
+          <span class="cig-tag">레귤러 • 진함</span>
+        </button>
+
+        <button class="cig-card" data-cig="raison" data-name="레종 블루" data-desc="연하고 담백한 맛. 점심 식후엔 이게 최고.">
+          <div class="cig-box" style="background: linear-gradient(135deg, #1a3a6b, #3498db);">
+            <div class="cig-brand">RAISON</div>
+            <div class="cig-type">BLUE</div>
+          </div>
+          <span class="cig-name">레종 블루</span>
+          <span class="cig-tag">라이트 • 담백</span>
+        </button>
+
+        <button class="cig-card" data-cig="tobplus" data-name="토브플러스 아이스" data-desc="강한 아이스로 머리가 맑아지는 느낌.">
+          <div class="cig-box" style="background: linear-gradient(135deg, #006080, #00bcd4);">
+            <div class="cig-brand">TOB+</div>
+            <div class="cig-type">ICE</div>
+          </div>
+          <span class="cig-name">토브플러스 아이스</span>
+          <span class="cig-tag">아이스 • 강함</span>
+        </button>
+
+        <button class="cig-card" data-cig="lm" data-name="L&M 실버" data-desc="가볍고 깔끔한 흡연감. 부담 없이 즐기기 딱.">
+          <div class="cig-box" style="background: linear-gradient(135deg, #555, #aaa);">
+            <div class="cig-brand">L&amp;M</div>
+            <div class="cig-type">SILVER</div>
+          </div>
+          <span class="cig-name">L&M 실버</span>
+          <span class="cig-tag">라이트 • 깔끔</span>
+        </button>
+
+        <button class="cig-card" data-cig="special" data-name="오늘의 특선담배 🌟" data-desc="미스터리한 선택. 오늘 하루도 고생했어.">
+          <div class="cig-box" style="background: linear-gradient(135deg, #6a0dad, #f39c12);">
+            <div class="cig-brand">★</div>
+            <div class="cig-type">SPECIAL</div>
+          </div>
+          <span class="cig-name">오늘의 특선</span>
+          <span class="cig-tag">미스터리 • 스페셜</span>
+        </button>
+
+      </div>
+    </div>
+
+    <div class="store-counter">
+      <div class="counter-display" id="counter-display">
+        <span class="counter-prompt">← 담배를 골라보세요</span>
+      </div>
+      <button class="btn-main" id="btn-buy" disabled>계산하기 💰</button>
+    </div>
+  </section>
+
+  <!-- ───────────────────────────────────────────
+       SCENE 2: 엘리베이터
+  ─────────────────────────────────────────── -->
+  <section id="scene-elevator" class="scene">
+    <div class="elevator-shaft">
+      <div class="elevator-door left" id="door-left"></div>
+      <div class="elevator-door right" id="door-right"></div>
+
+      <div class="elevator-interior" id="elevator-interior">
+        <div class="elevator-panel">
+          <div class="floor-display" id="floor-display">
+            <span class="floor-num" id="floor-num">11</span>
+            <span class="floor-unit">F</span>
+          </div>
+          <div class="floor-indicator" id="floor-indicator">▼</div>
+        </div>
+
+        <div class="elevator-buttons">
+          <div class="elev-btn active" id="btn-floor-b1">B1</div>
+          <div class="elev-btn" id="btn-floor-1">1F</div>
+          <div class="elev-btn lit" id="btn-floor-11">11F</div>
+        </div>
+
+        <div class="elevator-msg" id="elevator-msg">
+          <p>B1 흡연 정원으로</p>
+          <p>내려가는 중...</p>
+        </div>
+
+        <div class="cig-packet-in-hand" id="cig-packet">
+          <div class="cig-preview" id="cig-preview-elev"></div>
+          <span id="cig-name-elev"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="scene-overlay-text" id="elev-overlay">
+      <h2>엘리베이터 탑승 🛗</h2>
+      <p>B1 흡연 정원으로 내려갑니다</p>
+    </div>
+  </section>
+
+  <!-- ───────────────────────────────────────────
+       SCENE 3: 흡연 정원 - 불 붙이기
+  ─────────────────────────────────────────── -->
+  <section id="scene-garden" class="scene">
+    <div class="garden-bg">
+      <div class="garden-sky">
+        <div class="cloud cloud-1">☁</div>
+        <div class="cloud cloud-2">☁</div>
+        <div class="cloud cloud-3">⛅</div>
+      </div>
+      <div class="garden-ground"></div>
+      <div class="garden-plant plant-1">🌿</div>
+      <div class="garden-plant plant-2">🪴</div>
+      <div class="garden-plant plant-3">🌿</div>
+      <div class="ashtray">🚭<small>흡연 구역</small></div>
+    </div>
+
+    <div class="scene-header light">
+      <span class="scene-label">STEP 3 / 4</span>
+      <h2 class="scene-title">흡연 정원 🌿</h2>
+      <p class="scene-desc">담배에 불을 붙여봐요</p>
+    </div>
+
+    <div class="lighter-area">
+      <div class="cigarette-unlit" id="cig-unlit">
+        <div class="cig-stick">
+          <div class="cig-filter"></div>
+          <div class="cig-body">
+            <div class="cig-brand-text" id="cig-brand-display"></div>
+          </div>
+          <div class="cig-tip" id="cig-tip"></div>
+        </div>
+      </div>
+
+      <div class="lighter" id="lighter" title="라이터를 클릭하세요!">
+        <div class="lighter-body">
+          <div class="lighter-top">
+            <div class="lighter-spark" id="lighter-spark">✧</div>
+          </div>
+          <div class="lighter-grip">🔥</div>
+        </div>
+        <div class="lighter-flame" id="lighter-flame">
+          <div class="flame-inner"></div>
+          <div class="flame-outer"></div>
+        </div>
+      </div>
+
+      <p class="lighter-hint" id="lighter-hint">라이터를 클릭해서 불을 붙여보세요!</p>
+    </div>
+
+    <div class="lit-message" id="lit-message">
+      <p>딸깍 — 🔥</p>
+      <p class="lit-sub" id="lit-sub-text"></p>
+    </div>
+  </section>
+
+  <!-- ───────────────────────────────────────────
+       SCENE 4: 흡연 중 - 타이머 & 연기 뱉기
+  ─────────────────────────────────────────── -->
+  <section id="scene-smoke" class="scene">
+    <div class="smoke-bg">
+      <canvas id="smoke-canvas"></canvas>
+    </div>
+
+    <div class="smoke-header">
+      <span class="scene-label">STEP 4 / 4</span>
+      <h2>잠깐 쉬어가는 시간 🌬️</h2>
+    </div>
+
+    <div class="timer-area">
+      <div class="timer-ring">
+        <svg class="timer-svg" viewBox="0 0 200 200" aria-label="타이머">
+          <circle class="timer-bg-circle" cx="100" cy="100" r="88" />
+          <circle class="timer-progress-circle" id="timer-circle" cx="100" cy="100" r="88" />
+        </svg>
+        <div class="timer-display">
+          <span id="timer-min">10</span>:<span id="timer-sec">00</span>
+        </div>
+      </div>
+      <p class="timer-label" id="timer-label">마음껏 쉬어가세요 ☁</p>
+    </div>
+
+    <div class="cig-burning-area">
+      <div class="cig-burning" id="cig-burning">
+        <div class="cig-burning-filter"></div>
+        <div class="cig-burning-body" id="cig-burn-body"></div>
+        <div class="cig-burning-ash" id="cig-ash"></div>
+        <div class="cig-burning-ember" id="cig-ember">
+          <div class="ember-glow"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="smoke-interaction">
+      <button class="btn-exhale" id="btn-exhale" aria-label="연기 내뱉기">
+        <span class="exhale-icon">💨</span>
+        <span>후~ 내뱉기</span>
+      </button>
+      <p class="exhale-hint">클릭할 때마다 연기를 내뱉어요</p>
+    </div>
+
+    <div class="thought-bubble" id="thought-bubble">
+      <p id="thought-text"></p>
+    </div>
+
+    <div class="smoke-controls">
+      <button class="btn-skip" id="btn-skip-timer">다 피웠어요 ✓</button>
+    </div>
+  </section>
+
+  <!-- ───────────────────────────────────────────
+       SCENE 5: 엔딩
+  ─────────────────────────────────────────── -->
+  <section id="scene-ending" class="scene">
+    <div class="scene-content ending-content">
+      <div class="ending-icon">✨</div>
+      <h2 class="ending-title">잘 쉬었나요?</h2>
+      <p class="ending-sub" id="ending-sub"></p>
+      <div class="ending-stats">
+        <div class="stat-item">
+          <span class="stat-num" id="stat-exhale">0</span>
+          <span class="stat-label">번 내뱉기</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num" id="stat-time">10:00</span>
+          <span class="stat-label">휴식 시간</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num" id="stat-cig">-</span>
+          <span class="stat-label">선택한 담배</span>
+        </div>
+      </div>
+      <p class="ending-msg">이제 다시 일하러 가볼까요? 💼</p>
+      <div class="ending-buttons">
+        <button class="btn-main" id="btn-restart">다시 피러가기 🚬</button>
+        <button class="btn-sub" id="btn-back-work">업무 복귀 💻</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 씬 전환 오버레이 -->
+  <div class="transition-overlay" id="transition-overlay"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
