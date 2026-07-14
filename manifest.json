@@ -1,0 +1,17 @@
+{
+  "name": "담배 피러가기",
+  "short_name": "담배피러가기",
+  "description": "10분간의 달콤한 현실 도피 — 스모크 브레이크 시뮬레이션",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EEEBE2",
+  "theme_color": "#EEEBE2",
+  "lang": "ko",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -17,14 +17,40 @@
   --font-main: 'Noto Sans KR', sans-serif;
   --font-display: 'Black Han Sans', sans-serif;
   --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* light "storybook" theme used by intro / store / ending */
+  --bg-cream: #EEEBE2;
+  --cream-panel-top: #FBF8F0;
+  --cream-panel-bottom: #F2EDDC;
+  --cream-border: #DED7C2;
+  --wood: #C9A876;
+  --ink: #33302A;
+  --ink-muted: #8C8272;
+  --accent-ink: #C97B12;
 }
 
 html, body {
   width: 100%; height: 100%;
   overflow: hidden;
+  overscroll-behavior: none;
   font-family: var(--font-main);
   background: var(--bg-dark);
   color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+button, .cig-card, .lighter, .elev-btn, #soap-dip {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* iOS/Android notch & home-indicator safe areas */
+.scene {
+  padding-top: calc(env(safe-area-inset-top, 0px));
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px));
+  padding-left: calc(env(safe-area-inset-left, 0px));
+  padding-right: calc(env(safe-area-inset-right, 0px));
 }
 
 /* ================================================
@@ -118,13 +144,13 @@ html, body {
    SCENE 0: INTRO
    ================================================ */
 #scene-intro {
-  background: radial-gradient(ellipse at 50% 60%, #1a1208 0%, #0d0d0d 70%);
+  background: radial-gradient(ellipse at 50% 60%, var(--cream-panel-top) 0%, var(--bg-cream) 70%);
 }
 .intro-bg-text {
   position: absolute;
   font-family: var(--font-display);
   font-size: clamp(3rem, 14vw, 9rem);
-  color: rgba(255,255,255,0.03);
+  color: rgba(51,48,42,0.05);
   letter-spacing: 0.1em;
   user-select: none;
   pointer-events: none;
@@ -139,19 +165,19 @@ html, body {
 .intro-title {
   font-family: var(--font-display);
   font-size: clamp(2rem, 6vw, 3.5rem);
-  color: var(--accent);
+  color: var(--accent-ink);
   line-height: 1;
   margin-bottom: 0.5rem;
 }
 .intro-subtitle {
   font-size: 1rem;
-  color: var(--text-muted);
+  color: var(--ink);
   letter-spacing: 0.05em;
   margin-bottom: 1.5rem;
 }
 .intro-desc {
   font-size: 0.9rem;
-  color: #666;
+  color: var(--ink-muted);
   line-height: 1.8;
   margin-bottom: 2.5rem;
 }
@@ -160,42 +186,52 @@ html, body {
    SCENE 1: CONVENIENCE STORE
    ================================================ */
 #scene-store {
-  background: #111;
-  padding: 1.5rem 1rem;
+  background: var(--bg-cream);
+  padding: 1.5rem calc(1rem + env(safe-area-inset-right, 0px)) calc(1.5rem + env(safe-area-inset-bottom, 0px)) calc(1rem + env(safe-area-inset-left, 0px));
   gap: 0;
   justify-content: flex-start;
-  padding-top: 2rem;
+  padding-top: calc(2rem + env(safe-area-inset-top, 0px));
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
+#scene-store .scene-label { color: var(--accent-ink); }
+#scene-store .scene-title { color: var(--ink); }
+#scene-store .scene-desc  { color: var(--ink-muted); }
+
+/* shelf carcass: a wood-topped display case the packs sit inside */
 .store-shelf {
   width: 100%; max-width: 640px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
+  background: linear-gradient(180deg, var(--cream-panel-top) 0%, var(--cream-panel-bottom) 100%);
+  border: 1px solid var(--cream-border);
+  border-top: 6px solid var(--wood);
+  border-radius: 10px 10px 16px 16px;
   padding: 1.2rem;
   margin-bottom: 1.2rem;
+  box-shadow: 0 6px 18px rgba(90,70,30,0.1);
 }
 .shelf-label {
   font-size: 0.72rem;
   letter-spacing: 0.18em;
-  color: var(--text-muted);
+  color: var(--ink-muted);
   text-transform: uppercase;
   margin-bottom: 1rem;
   padding-bottom: 0.6rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px dashed var(--cream-border);
 }
 .cigarette-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.75rem;
+  gap: 0.9rem 0.75rem;
 }
 @media (max-width: 480px) { .cigarette-grid { grid-template-columns: repeat(2, 1fr); } }
 
+/* each card = one slot of the rack, with a little ledge that "holds" the pack */
 .cig-card {
-  background: var(--bg-card2);
+  background: linear-gradient(180deg, #F6F1E3 0%, #E9E0C6 100%);
   border: 2px solid transparent;
-  border-radius: 12px;
-  padding: 0.8rem 0.5rem;
+  border-bottom: 5px solid var(--wood);
+  border-radius: 10px 10px 5px 5px;
+  padding: 0.7rem 0.5rem 0.5rem;
   cursor: pointer;
   transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
   display: flex;
@@ -204,49 +240,44 @@ html, body {
   gap: 0.5rem;
   font-family: var(--font-main);
   text-align: center;
+  box-shadow: inset 0 3px 6px rgba(90,70,30,0.12), 0 2px 6px rgba(60,50,30,0.08);
 }
-.cig-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
-.cig-card.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(245,166,35,0.2); }
+.cig-card:hover { transform: translateY(-3px); box-shadow: inset 0 3px 6px rgba(90,70,30,0.12), 0 6px 16px rgba(60,50,30,0.18); }
+.cig-card.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(245,166,35,0.25); }
 
 .cig-box {
-  width: 56px; height: 72px;
-  border-radius: 6px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  box-shadow: inset 0 -3px 8px rgba(0,0,0,0.3), 0 3px 10px rgba(0,0,0,0.4);
+  width: 100%; max-width: 132px; height: 158px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 6px rgba(60,50,30,0.3));
 }
-.cig-brand { font-size: 0.6rem; font-weight: 700; color: rgba(255,255,255,0.9); letter-spacing: 0.05em; }
-.cig-type  { font-size: 0.55rem; color: rgba(255,255,255,0.7); margin-top: 2px; }
-.cig-name  { font-size: 0.75rem; font-weight: 500; color: var(--text); }
-.cig-tag   { font-size: 0.65rem; color: var(--text-muted); }
+.cig-tag   { font-size: 0.68rem; color: var(--ink-muted); }
 
 .store-counter {
   width: 100%; max-width: 640px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--cream-panel-top) 0%, var(--cream-panel-bottom) 100%);
+  border: 1px solid var(--cream-border);
   border-radius: 16px;
   padding: 1.2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  box-shadow: 0 6px 18px rgba(90,70,30,0.1);
 }
 .counter-display {
   flex: 1;
   font-size: 0.88rem;
-  color: var(--text-muted);
+  color: var(--ink-muted);
 }
 .counter-display .cig-selected-name {
   font-weight: 700;
-  color: var(--accent);
+  color: var(--accent-ink);
   font-size: 1rem;
   display: block;
 }
 .counter-display .cig-selected-desc {
   font-size: 0.78rem;
-  color: var(--text-muted);
+  color: var(--ink-muted);
   margin-top: 0.2rem;
   display: block;
   line-height: 1.5;
@@ -339,7 +370,7 @@ html, body {
   border: 1px solid #333;
 }
 .elev-btn {
-  width: 40px; height: 40px;
+  width: 44px; height: 44px;
   border-radius: 50%;
   background: #2a2a2a;
   border: 1px solid #444;
@@ -390,7 +421,7 @@ html, body {
 #scene-garden {
   background: linear-gradient(180deg, #87CEEB 0%, #98D8C8 40%, #5a8a5a 40%, #3d6b3d 100%);
   justify-content: flex-start;
-  padding-top: 1.5rem;
+  padding-top: calc(1.5rem + env(safe-area-inset-top, 0px));
   gap: 0;
 }
 #scene-garden .scene-header { margin-bottom: 0.8rem; }
@@ -576,7 +607,7 @@ html, body {
 #scene-smoke {
   background: radial-gradient(ellipse at 50% 70%, #1a2a1a 0%, #0a0f0a 70%);
   gap: 0;
-  padding: 1.5rem 1rem;
+  padding: calc(1.5rem + env(safe-area-inset-top, 0px)) calc(1rem + env(safe-area-inset-right, 0px)) calc(1.5rem + env(safe-area-inset-bottom, 0px)) calc(1rem + env(safe-area-inset-left, 0px));
   justify-content: flex-start;
 }
 .smoke-bg {
@@ -716,6 +747,27 @@ html, body {
 .exhale-icon { font-size: 1.4rem; }
 .exhale-hint { font-size: 0.72rem; color: var(--text-muted); }
 
+.btn-mic {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 0.4rem 1rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-family: var(--font-main);
+  cursor: pointer;
+  margin-top: 0.2rem;
+  transition: border-color 0.2s, color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.btn-mic:hover { color: var(--text); border-color: #555; }
+.btn-mic.active {
+  color: var(--green);
+  border-color: var(--green);
+  background: rgba(46,204,113,0.1);
+  box-shadow: 0 0 12px rgba(46,204,113,0.3);
+  animation: btnPulse 1.5s ease-in-out infinite;
+}
+
 /* thought bubble */
 .thought-bubble {
   position: relative; z-index: 2;
@@ -753,26 +805,29 @@ html, body {
    SCENE 5: ENDING
    ================================================ */
 #scene-ending {
-  background: radial-gradient(ellipse at 50% 40%, #1a1008 0%, #0d0d0d 70%);
+  background: radial-gradient(ellipse at 50% 40%, var(--cream-panel-top) 0%, var(--bg-cream) 70%);
 }
 .ending-content { text-align: center; position: relative; z-index: 2; max-width: 400px; width: 90%; }
 .ending-icon { font-size: 3rem; margin-bottom: 0.8rem; animation: float 3s ease-in-out infinite; }
-.ending-title { font-family: var(--font-display); font-size: 2rem; color: var(--accent); margin-bottom: 0.5rem; }
-.ending-sub { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.7; }
+.ending-title { font-family: var(--font-display); font-size: 2rem; color: var(--accent-ink); margin-bottom: 0.5rem; }
+.ending-sub { font-size: 0.88rem; color: var(--ink-muted); margin-bottom: 1.5rem; line-height: 1.7; }
 
 .ending-stats {
   display: flex;
   justify-content: center;
   gap: 1.5rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--cream-panel-top) 0%, var(--cream-panel-bottom) 100%);
+  border: 1px solid var(--cream-border);
   border-radius: 16px;
   padding: 1.2rem;
   margin-bottom: 1.5rem;
+  box-shadow: 0 6px 18px rgba(90,70,30,0.1);
 }
 .stat-item { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
-.stat-num { font-family: 'Courier New', monospace; font-size: 1.4rem; font-weight: 700; color: var(--accent); }
-.stat-label { font-size: 0.7rem; color: var(--text-muted); }
+.stat-num { font-family: 'Courier New', monospace; font-size: 1.4rem; font-weight: 700; color: var(--accent-ink); }
+.stat-label { font-size: 0.7rem; color: var(--ink-muted); }
 
-.ending-msg { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+.ending-msg { font-size: 0.9rem; color: var(--ink-muted); margin-bottom: 1.5rem; }
 .ending-buttons { display: flex; flex-direction: column; align-items: center; gap: 0.8rem; }
+#scene-ending .btn-sub { border-color: var(--cream-border); color: var(--ink-muted); }
+#scene-ending .btn-sub:hover { border-color: var(--ink-muted); color: var(--ink); }

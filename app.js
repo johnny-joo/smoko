@@ -48,6 +48,71 @@ const THOUGHTS = [
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => document.querySelectorAll(selector);
 
+// ── Button Click Sound ─────────────────────────
+let audioCtx = null;
+function playClickSound() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    const osc  = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(900, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.06);
+
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.08);
+  } catch (err) {
+    // Web Audio 미지원 브라우저는 조용히 무시
+  }
+}
+
+document.addEventListener('click', (e) => {
+  if (e.target.closest('button')) playClickSound();
+});
+
+// ── Scene Sound Effects ────────────────────────
+const SFX = {
+  elevatorEnter:  new Audio('sounds/elevator.mp3'),
+  elevatorRide:   new Audio('sounds/elevator-noise.mp3'),
+  rooftopAmbient: new Audio('sounds/building-rooftops-ambient.mp3'),
+  walking:        new Audio('sounds/walking-sound-effect.mp3'),
+  lighterFlame:   new Audio('sounds/lighter-smoke.mp3'),
+};
+SFX.elevatorEnter.volume  = 0.7;
+SFX.elevatorRide.volume   = 0.5;
+SFX.rooftopAmbient.volume = 0.35;
+SFX.walking.volume        = 0.6;
+SFX.lighterFlame.volume   = 0.8;
+
+function playSfx(audio) {
+  try {
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
+  } catch (err) { /* 오디오 미지원 브라우저는 조용히 무시 */ }
+}
+function playLoop(audio) {
+  audio.loop = true;
+  playSfx(audio);
+}
+function stopSfx(audio) {
+  try {
+    audio.pause();
+    audio.currentTime = 0;
+  } catch (err) { /* no-op */ }
+}
+function stopAllSfx() {
+  Object.values(SFX).forEach(stopSfx);
+}
+
 // ── Scene Management ───────────────────────────
 const SCENES = ['scene-intro', 'scene-store', 'scene-elevator', 'scene-garden', 'scene-smoke', 'scene-ending'];
 let currentScene = 'scene-intro';
@@ -143,10 +208,13 @@ function initElevator() {
   doorL.classList.remove('open');
   doorR.classList.remove('open');
 
-  // floor countdown: 11 → B1
+  playSfx(SFX.elevatorEnter);
+  playLoop(SFX.elevatorRide);
+
+  // floor countdown: 11 → 77 (rooftop)
   const floorNum = $('#floor-num');
   const floorIndicator = $('#floor-indicator');
-  const floorSequence = [11, 9, 7, 5, 3, 1, 'B1'];
+  const floorSequence = [11, 22, 33, 44, 55, 66, 77];
   let idx = 0;
   floorNum.textContent = floorSequence[0];
 
@@ -154,14 +222,16 @@ function initElevator() {
     idx++;
     if (idx < floorSequence.length) {
       floorNum.textContent = floorSequence[idx];
-      if (floorSequence[idx] === 'B1') {
+      if (floorSequence[idx] === 77) {
         floorIndicator.textContent = '●';
         floorIndicator.style.animation = 'none';
         clearInterval(floorTimer);
+        stopSfx(SFX.elevatorRide);
         // doors open, then transition
         setTimeout(() => {
           doorL.classList.add('open');
           doorR.classList.add('open');
+          playSfx(SFX.walking);
           setTimeout(() => goToScene('scene-garden'), 1800);
         }, 700);
       }
@@ -174,6 +244,8 @@ function initElevator() {
 // ────────────────────────────────────────────────
 function initGarden() {
   const cig = CIG_DATA[state.selectedCig];
+
+  playLoop(SFX.rooftopAmbient);
 
   // set brand text on the cigarette
   $('#cig-brand-display').textContent = cig.name.toUpperCase();
@@ -196,6 +268,7 @@ function initGarden() {
 
     // show flame
     flame.classList.add('burning');
+    playSfx(SFX.lighterFlame);
 
     // tip glows after a short delay
     setTimeout(() => {
@@ -233,6 +306,7 @@ let thoughtTimeout = null;
 
 function initSmoke() {
   // reset state
+  stopMic();
   state.timerRemaining = state.timerDuration;
   state.exhaleCount = 0;
   state.timerStarted = false;
@@ -276,8 +350,13 @@ function initSmoke() {
 }
 
 function resizeCanvas(canvas) {
-  canvas.width  = window.innerWidth;
-  canvas.height = window.innerHeight;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+  canvas.width  = Math.round(window.innerWidth * dpr);
+  canvas.height = Math.round(window.innerHeight * dpr);
+  canvas.style.width  = window.innerWidth + 'px';
+  canvas.style.height = window.innerHeight + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 
 function updateTimerDisplay(secs) {
@@ -309,47 +388,75 @@ function updateCigBurn() {
   $('#cig-ash').style.width = ashWidth + 'px';
 }
 
-// ── Smoke Particle System ──────────────────────
-function createSmokeParticle(canvas, burst = false) {
-  const x = canvas.width / 2 + (Math.random() - 0.5) * (burst ? 80 : 20);
-  const y = canvas.height * 0.62;
+// ── Smoke / Bubble Particle System ─────────────
+function isBubbleMode() {
+  return state.selectedCig === 'bubble';
+}
+
+function createSmokeParticle(canvas, burst = false, intensity = 1) {
+  const w = canvas.clientWidth  || window.innerWidth;
+  const h = canvas.clientHeight || window.innerHeight;
+  const spread = (burst ? 80 : 20) * intensity;
+  const x = w / 2 + (Math.random() - 0.5) * spread;
+  const y = h * 0.62;
+  const bubble = isBubbleMode();
+
   return {
-    x, y,
-    vx: (Math.random() - 0.5) * (burst ? 3 : 1.2),
-    vy: -(Math.random() * (burst ? 4 : 2) + 1.5),
-    radius: Math.random() * (burst ? 22 : 12) + (burst ? 8 : 4),
-    alpha: burst ? 0.55 : 0.35,
+    x, y, bubble,
+    vx: (Math.random() - 0.5) * (burst ? 3 : 1.2) * (bubble ? 1.3 : 1),
+    vy: -(Math.random() * (burst ? 4 : 2) * intensity + (bubble ? 1 : 1.5)),
+    radius: (Math.random() * (burst ? 22 : 12) * Math.max(0.5, intensity) + (burst ? 8 : 4)) * (bubble ? 0.85 : 1),
+    alpha: (burst ? 0.55 : 0.35) * Math.min(1.4, Math.max(0.5, intensity)),
     life: 1,
-    decay: Math.random() * 0.006 + (burst ? 0.012 : 0.005),
+    decay: (Math.random() * 0.006 + (burst ? 0.012 : 0.005)) * (bubble ? 0.85 : 1),
     wobble: Math.random() * Math.PI * 2,
   };
 }
 
 function renderSmoke(canvas, ctx) {
-  // auto-emit particles from burning ember
+  const w = canvas.clientWidth  || window.innerWidth;
+  const h = canvas.clientHeight || window.innerHeight;
+
+  // auto-emit particles from burning ember / wand
   if (Math.random() < 0.3) {
     smokeParticles.push(createSmokeParticle(canvas, false));
   }
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, w, h);
 
   smokeParticles = smokeParticles.filter(p => p.life > 0);
   smokeParticles.forEach(p => {
     p.wobble += 0.04;
-    p.x  += p.vx + Math.sin(p.wobble) * 0.4;
+    p.x  += p.vx + Math.sin(p.wobble) * (p.bubble ? 0.7 : 0.4);
     p.y  += p.vy;
     p.vy *= 0.995;
-    p.radius += 0.18;
+    p.radius += p.bubble ? 0.12 : 0.18;
     p.life   -= p.decay;
-    p.alpha   = p.life * 0.4;
+    p.alpha   = p.life * (p.bubble ? 0.5 : 0.4);
 
     ctx.beginPath();
-    const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
-    grad.addColorStop(0, `rgba(200,220,200,${p.alpha})`);
-    grad.addColorStop(1, `rgba(150,180,150,0)`);
-    ctx.fillStyle = grad;
-    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-    ctx.fill();
+    if (p.bubble) {
+      const grad = ctx.createRadialGradient(
+        p.x - p.radius * 0.3, p.y - p.radius * 0.35, 0,
+        p.x, p.y, p.radius
+      );
+      grad.addColorStop(0,   `rgba(255,255,255,${Math.min(0.85, p.alpha * 1.6)})`);
+      grad.addColorStop(0.4, `rgba(190,225,240,${p.alpha * 0.7})`);
+      grad.addColorStop(1,   `rgba(150,190,220,0)`);
+      ctx.fillStyle = grad;
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = `rgba(255,255,255,${p.alpha * 0.8})`;
+      ctx.stroke();
+    } else {
+      const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
+      grad.addColorStop(0, `rgba(200,220,200,${p.alpha})`);
+      grad.addColorStop(1, `rgba(150,180,150,0)`);
+      ctx.fillStyle = grad;
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
   });
 
   animFrame = requestAnimationFrame(() => {
@@ -357,25 +464,115 @@ function renderSmoke(canvas, ctx) {
   });
 }
 
-// ── Exhale Button ──────────────────────────────
-$('#btn-exhale').addEventListener('click', () => {
+// ── Exhale / Blow Interaction ──────────────────
+// intensity: 1 = 기본 버튼 세기. 마이크 감지 시 숨 세기에 따라 0.4~1.8 범위로 전달됨.
+function triggerExhale(intensity = 1) {
   state.exhaleCount++;
-  if (navigator.vibrate) navigator.vibrate(40);
+  if (navigator.vibrate) navigator.vibrate(Math.round(40 * Math.min(1.5, intensity)));
 
-  // burst particles
   const canvas = $('#smoke-canvas');
-  for (let i = 0; i < 18; i++) {
-    smokeParticles.push(createSmokeParticle(canvas, true));
+  const count  = Math.round(18 * Math.min(1.6, Math.max(0.5, intensity)));
+  for (let i = 0; i < count; i++) {
+    smokeParticles.push(createSmokeParticle(canvas, true, intensity));
   }
 
   // button animation
   const btn = $('#btn-exhale');
-  btn.style.transform = 'scale(0.92)';
+  btn.style.transform = `scale(${0.92 - Math.min(0.1, intensity * 0.03)})`;
   setTimeout(() => { btn.style.transform = ''; }, 120);
 
-  // show random thought
   showThought();
-});
+}
+
+$('#btn-exhale').addEventListener('click', () => triggerExhale(1));
+
+// ── Mic Blow Detection ─────────────────────────
+// 마이크로 숨 세기를 측정해서 세게 불수록 연기를 더 세게/많이 뱉도록 연결.
+let micStream = null;
+let micAnalyser = null;
+let micActive = false;
+let micRAF = null;
+let lastBlowTrigger = 0;
+const MIC_THRESHOLD = 0.045; // 이 RMS 이상이어야 "숨을 불었다"로 인식 (주변 소음 무시)
+const MIC_COOLDOWN = 220;    // 같은 숨으로 여러 번 트리거되지 않도록 최소 간격(ms)
+
+async function toggleMic() {
+  if (micActive) { stopMic(); return; }
+
+  const btn = $('#btn-mic');
+  const hint = $('#exhale-hint');
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    hint.textContent = '이 브라우저는 마이크 입력을 지원하지 않아요.';
+    return;
+  }
+
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (err) {
+    hint.textContent = '마이크 권한이 없어서 버튼으로만 내뱉을 수 있어요.';
+    return;
+  }
+
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+  const micSource = audioCtx.createMediaStreamSource(micStream);
+  micAnalyser = audioCtx.createAnalyser();
+  micAnalyser.fftSize = 512;
+  micSource.connect(micAnalyser);
+
+  micActive = true;
+  btn.classList.add('active');
+  btn.textContent = '🎤 마이크 끄기';
+  btn.setAttribute('aria-pressed', 'true');
+  hint.textContent = '마이크에 대고 후~ 불어보세요';
+
+  monitorMic();
+}
+
+function stopMic() {
+  micActive = false;
+  cancelAnimationFrame(micRAF);
+  if (micStream) micStream.getTracks().forEach((t) => t.stop());
+  micStream = null;
+  micAnalyser = null;
+
+  const btn = $('#btn-mic');
+  if (btn) {
+    btn.classList.remove('active');
+    btn.textContent = '🎤 마이크로 불기';
+    btn.setAttribute('aria-pressed', 'false');
+  }
+  const hint = $('#exhale-hint');
+  if (hint) hint.textContent = '클릭할 때마다 연기를 내뱉어요';
+}
+
+function monitorMic() {
+  if (!micActive || currentScene !== 'scene-smoke') { stopMic(); return; }
+
+  const data = new Uint8Array(micAnalyser.fftSize);
+  micAnalyser.getByteTimeDomainData(data);
+
+  let sumSquares = 0;
+  for (let i = 0; i < data.length; i++) {
+    const v = (data[i] - 128) / 128;
+    sumSquares += v * v;
+  }
+  const rms = Math.sqrt(sumSquares / data.length);
+
+  const now = performance.now();
+  if (rms > MIC_THRESHOLD && now - lastBlowTrigger > MIC_COOLDOWN) {
+    lastBlowTrigger = now;
+    // 숨 세기(rms)를 intensity 0.4~1.8 범위로 매핑
+    const intensity = Math.min(1.8, Math.max(0.4, 0.4 + ((rms - MIC_THRESHOLD) / 0.35) * 1.4));
+    triggerExhale(intensity);
+  }
+
+  micRAF = requestAnimationFrame(monitorMic);
+}
+
+$('#btn-mic').addEventListener('click', toggleMic);
 
 // ── Thought Bubbles ────────────────────────────
 let usedThoughts = [];
@@ -421,6 +618,8 @@ function initEnding() {
   state.endTime = Date.now();
   cancelAnimationFrame(animFrame);
   clearTimeout(thoughtTimeout);
+  stopMic();
+  stopAllSfx();
 
   const cig       = CIG_DATA[state.selectedCig] || { name: '???' };
   const elapsed   = state.timerDuration - Math.max(0, state.timerRemaining);
@@ -460,6 +659,15 @@ window.addEventListener('resize', () => {
   const canvas = $('#smoke-canvas');
   if (canvas) resizeCanvas(canvas);
 });
+
+// ────────────────────────────────────────────────
+// PWA: service worker registration
+// ────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
 
 // ────────────────────────────────────────────────
 // KEYBOARD SHORTCUTS

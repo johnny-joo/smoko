@@ -2,8 +2,20 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>담배 피러가기 🚬</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#EEEBE2" />
+  <link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="담배 피러가기" />
+  <meta name="format-detection" content="telephone=no" />
+
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -40,57 +52,33 @@
 
       <div class="cigarette-grid">
 
-        <button class="cig-card" data-cig="esse" data-name="에쎄 체인지" data-desc="부드럽고 시원한 멘솔. 회사에서 이 정도면 충분해.">
-          <div class="cig-box" style="background: linear-gradient(135deg, #1a6b3c, #2ecc71);">
-            <div class="cig-brand">ESSE</div>
-            <div class="cig-type">CHANGE</div>
-          </div>
-          <span class="cig-name">에쎄 체인지</span>
+        <button class="cig-card" data-cig="esse" data-name="에쎄쎄 체인지" data-desc="부드럽고 시원한 멘솔. 회사에서 이 정도면 충분해.">
+          <img class="cig-box" src="ciga-images/cutout/7.png" alt="에쎄쎄 체인지">
           <span class="cig-tag">멘솔 • 순함</span>
         </button>
 
-        <button class="cig-card" data-cig="marlboro" data-name="말보로 레드" data-desc="진한 풀바디. 스트레스받은 날엔 역시 이거지.">
-          <div class="cig-box" style="background: linear-gradient(135deg, #8b0000, #e74c3c);">
-            <div class="cig-brand">MARLBORO</div>
-            <div class="cig-type">RED</div>
-          </div>
-          <span class="cig-name">말보로 레드</span>
+        <button class="cig-card" data-cig="marlboro" data-name="말보로로 레드" data-desc="진한 풀바디. 스트레스받은 날엔 역시 이거지.">
+          <img class="cig-box" src="ciga-images/cutout/4.png" alt="말보로로 레드">
           <span class="cig-tag">레귤러 • 진함</span>
         </button>
 
-        <button class="cig-card" data-cig="raison" data-name="레종 블루" data-desc="연하고 담백한 맛. 점심 식후엔 이게 최고.">
-          <div class="cig-box" style="background: linear-gradient(135deg, #1a3a6b, #3498db);">
-            <div class="cig-brand">RAISON</div>
-            <div class="cig-type">BLUE</div>
-          </div>
-          <span class="cig-name">레종 블루</span>
+        <button class="cig-card" data-cig="raison" data-name="리종 블루" data-desc="연하고 담백한 맛. 점심 식후엔 이게 최고.">
+          <img class="cig-box" src="ciga-images/cutout/5.png" alt="리종 블루">
           <span class="cig-tag">라이트 • 담백</span>
         </button>
 
-        <button class="cig-card" data-cig="tobplus" data-name="토브플러스 아이스" data-desc="강한 아이스로 머리가 맑아지는 느낌.">
-          <div class="cig-box" style="background: linear-gradient(135deg, #006080, #00bcd4);">
-            <div class="cig-brand">TOB+</div>
-            <div class="cig-type">ICE</div>
-          </div>
-          <span class="cig-name">토브플러스 아이스</span>
+        <button class="cig-card" data-cig="tobplus" data-name="돈힐" data-desc="강한 아이스로 머리가 맑아지는 느낌.">
+          <img class="cig-box" src="ciga-images/cutout/8.png" alt="돈힐">
           <span class="cig-tag">아이스 • 강함</span>
         </button>
 
-        <button class="cig-card" data-cig="lm" data-name="L&M 실버" data-desc="가볍고 깔끔한 흡연감. 부담 없이 즐기기 딱.">
-          <div class="cig-box" style="background: linear-gradient(135deg, #555, #aaa);">
-            <div class="cig-brand">L&amp;M</div>
-            <div class="cig-type">SILVER</div>
-          </div>
-          <span class="cig-name">L&M 실버</span>
+        <button class="cig-card" data-cig="lm" data-name="LLM 실버" data-desc="가볍고 깔끔한 흡연감. 부담 없이 즐기기 딱.">
+          <img class="cig-box" src="ciga-images/cutout/6.png" alt="LLM 실버">
           <span class="cig-tag">라이트 • 깔끔</span>
         </button>
 
         <button class="cig-card" data-cig="special" data-name="오늘의 특선담배 🌟" data-desc="미스터리한 선택. 오늘 하루도 고생했어.">
-          <div class="cig-box" style="background: linear-gradient(135deg, #6a0dad, #f39c12);">
-            <div class="cig-brand">★</div>
-            <div class="cig-type">SPECIAL</div>
-          </div>
-          <span class="cig-name">오늘의 특선</span>
+          <img class="cig-box" src="ciga-images/cutout/3.png" alt="오늘의 특선담배">
           <span class="cig-tag">미스터리 • 스페셜</span>
         </button>
 
@@ -119,18 +107,18 @@
             <span class="floor-num" id="floor-num">11</span>
             <span class="floor-unit">F</span>
           </div>
-          <div class="floor-indicator" id="floor-indicator">▼</div>
+          <div class="floor-indicator" id="floor-indicator">▲</div>
         </div>
 
         <div class="elevator-buttons">
-          <div class="elev-btn active" id="btn-floor-b1">B1</div>
-          <div class="elev-btn" id="btn-floor-1">1F</div>
           <div class="elev-btn lit" id="btn-floor-11">11F</div>
+          <div class="elev-btn" id="btn-floor-45">45F</div>
+          <div class="elev-btn active" id="btn-floor-77">77F</div>
         </div>
 
         <div class="elevator-msg" id="elevator-msg">
-          <p>B1 흡연 정원으로</p>
-          <p>내려가는 중...</p>
+          <p>77F 옥상 정원으로</p>
+          <p>올라가는 중...</p>
         </div>
 
         <div class="cig-packet-in-hand" id="cig-packet">
@@ -142,12 +130,12 @@
 
     <div class="scene-overlay-text" id="elev-overlay">
       <h2>엘리베이터 탑승 🛗</h2>
-      <p>B1 흡연 정원으로 내려갑니다</p>
+      <p>77F 옥상 정원으로 올라갑니다</p>
     </div>
   </section>
 
   <!-- ───────────────────────────────────────────
-       SCENE 3: 흡연 정원 - 불 붙이기
+       SCENE 3: 옥상 정원 - 불 붙이기
   ─────────────────────────────────────────── -->
   <section id="scene-garden" class="scene">
     <div class="garden-bg">
@@ -165,7 +153,7 @@
 
     <div class="scene-header light">
       <span class="scene-label">STEP 3 / 4</span>
-      <h2 class="scene-title">흡연 정원 🌿</h2>
+      <h2 class="scene-title">옥상 정원 🌿</h2>
       <p class="scene-desc">담배에 불을 붙여봐요</p>
     </div>
 
@@ -244,7 +232,8 @@
         <span class="exhale-icon">💨</span>
         <span>후~ 내뱉기</span>
       </button>
-      <p class="exhale-hint">클릭할 때마다 연기를 내뱉어요</p>
+      <p class="exhale-hint" id="exhale-hint">클릭할 때마다 연기를 내뱉어요</p>
+      <button class="btn-mic" id="btn-mic" aria-pressed="false">🎤 마이크로 불기</button>
     </div>
 
     <div class="thought-bubble" id="thought-bubble">
