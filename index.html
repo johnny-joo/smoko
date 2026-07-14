@@ -77,7 +77,7 @@
           <span class="cig-tag">라이트 • 깔끔</span>
         </button>
 
-        <button class="cig-card" data-cig="special" data-name="오늘의 특선담배 🌟" data-desc="미스터리한 선택. 오늘 하루도 고생했어.">
+        <button class="cig-card" data-cig="bubble" data-name="오늘의 특선담배 🌟" data-desc="미스터리한 선택. 오늘 하루도 고생했어.">
           <img class="cig-box" src="ciga-images/cutout/3.png" alt="오늘의 특선담배">
           <span class="cig-tag">미스터리 • 스페셜</span>
         </button>
@@ -159,12 +159,16 @@
 
     <div class="lighter-area">
       <div class="cigarette-unlit" id="cig-unlit">
-        <div class="cig-stick">
+        <div class="cig-stick" id="cig-stick-normal">
           <div class="cig-filter"></div>
           <div class="cig-body">
             <div class="cig-brand-text" id="cig-brand-display"></div>
           </div>
           <div class="cig-tip" id="cig-tip"></div>
+        </div>
+        <div class="bubble-wand" id="bubble-wand">
+          <div class="wand-ring"><div class="wand-film"></div></div>
+          <div class="wand-handle"></div>
         </div>
       </div>
 
@@ -173,7 +177,7 @@
           <div class="lighter-top">
             <div class="lighter-spark" id="lighter-spark">✧</div>
           </div>
-          <div class="lighter-grip">🔥</div>
+          <div class="lighter-grip" id="lighter-grip-icon">🔥</div>
         </div>
         <div class="lighter-flame" id="lighter-flame">
           <div class="flame-inner"></div>
@@ -185,7 +189,7 @@
     </div>
 
     <div class="lit-message" id="lit-message">
-      <p>딸깍 — 🔥</p>
+      <p id="lit-headline">딸깍 — 🔥</p>
       <p class="lit-sub" id="lit-sub-text"></p>
     </div>
   </section>
@@ -225,12 +229,16 @@
           <div class="ember-glow"></div>
         </div>
       </div>
+      <div class="bubble-wand bubble-wand-burning" id="bubble-wand-burning">
+        <div class="wand-ring"><div class="wand-film"></div></div>
+        <div class="wand-handle"></div>
+      </div>
     </div>
 
     <div class="smoke-interaction">
       <button class="btn-exhale" id="btn-exhale" aria-label="연기 내뱉기">
-        <span class="exhale-icon">💨</span>
-        <span>후~ 내뱉기</span>
+        <span class="exhale-icon" id="exhale-icon">💨</span>
+        <span id="exhale-label">후~ 내뱉기</span>
       </button>
       <p class="exhale-hint" id="exhale-hint">클릭할 때마다 연기를 내뱉어요</p>
       <button class="btn-mic" id="btn-mic" aria-pressed="false">🎤 마이크로 불기</button>

@@ -22,7 +22,7 @@ const CIG_DATA = {
   raison:  { name: '레종 블루',       desc: '연하고 담백한 맛. 점심 식후엔 이게 최고.',         color: '#3498db' },
   tobplus: { name: '토브플러스 아이스',desc: '강한 아이스로 머리가 맑아지는 느낌.',             color: '#00bcd4' },
   lm:      { name: 'L&M 실버',        desc: '가볍고 깔끔한 흡연감. 부담 없이 즐기기 딱.',       color: '#aaa'    },
-  special: { name: '오늘의 특선',     desc: '미스터리한 선택. 오늘 하루도 고생했어.',           color: '#f39c12' },
+  bubble:  { name: '오늘의 특선',     desc: '미스터리한 선택. 오늘 하루도 고생했어.',           color: '#f39c12' },
 };
 
 // ── Thoughts (연기 뱉을 때 나오는 생각들) ──────
@@ -86,12 +86,18 @@ const SFX = {
   rooftopAmbient: new Audio('sounds/building-rooftops-ambient.mp3'),
   walking:        new Audio('sounds/walking-sound-effect.mp3'),
   lighterFlame:   new Audio('sounds/lighter-smoke.mp3'),
+  bubbleLight:    new Audio('sounds/light-bubble.mp3'),
+  bubbleStrong:   new Audio('sounds/strong-bubble.mp3'),
 };
 SFX.elevatorEnter.volume  = 0.7;
 SFX.elevatorRide.volume   = 0.5;
 SFX.rooftopAmbient.volume = 0.35;
 SFX.walking.volume        = 0.6;
 SFX.lighterFlame.volume   = 0.8;
+SFX.bubbleLight.volume    = 0.55;
+SFX.bubbleStrong.volume   = 0.8;
+// 이 세기 이상이면 "세게 불었다"로 보고 strong-bubble 사운드를 튼다 (triggerExhale의 intensity 기준)
+const BUBBLE_STRONG_THRESHOLD = 1.2;
 
 function playSfx(audio) {
   try {
@@ -244,11 +250,18 @@ function initElevator() {
 // ────────────────────────────────────────────────
 function initGarden() {
   const cig = CIG_DATA[state.selectedCig];
+  const bubbleMode = isBubbleMode();
 
   playLoop(SFX.rooftopAmbient);
 
   // set brand text on the cigarette
   $('#cig-brand-display').textContent = cig.name.toUpperCase();
+
+  // swap the cigarette for a bubble wand when the "bubble" pack is selected
+  const wand = $('#bubble-wand');
+  $('#cig-stick-normal').style.display = bubbleMode ? 'none' : 'flex';
+  wand.style.display = bubbleMode ? 'flex' : 'none';
+  wand.classList.remove('ready');
 
   // reset state
   const tip      = $('#cig-tip');
@@ -259,10 +272,18 @@ function initGarden() {
   flame.classList.remove('burning');
   litMsg.classList.remove('show');
   hint.style.display = '';
+  hint.textContent = bubbleMode
+    ? '막대를 클릭해서 비눗물에 담가보세요!'
+    : '라이터를 클릭해서 불을 붙여보세요!';
 
   let isLit = false;
 
   const lighter = $('#lighter');
+  lighter.classList.toggle('bubble-mode', bubbleMode);
+  lighter.title = bubbleMode ? '비눗물에 담가보세요!' : '라이터를 클릭하세요!';
+  $('#lighter-grip-icon').textContent = bubbleMode ? '🧴' : '🔥';
+  $('#lighter-spark').textContent = bubbleMode ? '💧' : '✧';
+
   function lightCigarette() {
     if (isLit) return;
 
@@ -273,6 +294,7 @@ function initGarden() {
     // tip glows after a short delay
     setTimeout(() => {
       tip.classList.add('lit');
+      wand.classList.add('ready');
       if (navigator.vibrate) navigator.vibrate([50, 30, 80]);
     }, 400);
 
@@ -281,7 +303,8 @@ function initGarden() {
       flame.classList.remove('burning');
       litMsg.classList.add('show');
       hint.style.display = 'none';
-      $('#lit-sub-text').textContent = `${cig.name} — 불 붙었어요`;
+      $('#lit-headline').textContent = bubbleMode ? '퐁 — 🫧' : '딸깍 — 🔥';
+      $('#lit-sub-text').textContent = bubbleMode ? `${cig.name} — 준비됐어요` : `${cig.name} — 불 붙었어요`;
       isLit = true;
     }, 1000);
 
@@ -307,6 +330,7 @@ let thoughtTimeout = null;
 function initSmoke() {
   // reset state
   stopMic();
+  const bubbleMode = isBubbleMode();
   state.timerRemaining = state.timerDuration;
   state.exhaleCount = 0;
   state.timerStarted = false;
@@ -318,9 +342,21 @@ function initSmoke() {
   const ctx    = canvas.getContext('2d');
   resizeCanvas(canvas);
 
+  // swap the burning cigarette for the bubble wand when relevant
+  $('#cig-burning').style.display = bubbleMode ? 'none' : 'flex';
+  $('#bubble-wand-burning').style.display = bubbleMode ? 'flex' : 'none';
+
   // reset cigarette visual
   $('#cig-burn-body').style.width = '120px';
   $('#cig-ash').style.width = '0px';
+
+  // exhale button / hint copy
+  const copy = exhaleCopy();
+  $('#exhale-icon').textContent = copy.icon;
+  $('#exhale-label').textContent = copy.label;
+  $('#exhale-hint').textContent = copy.hint;
+  $('#btn-exhale').setAttribute('aria-label', bubbleMode ? '비눗방울 불기' : '연기 내뱉기');
+  $('#btn-skip-timer').textContent = bubbleMode ? '다 불었어요 ✓' : '다 피웠어요 ✓';
 
   // update timer display
   updateTimerDisplay(state.timerRemaining);
@@ -332,11 +368,11 @@ function initSmoke() {
     state.timerRemaining--;
     updateTimerDisplay(state.timerRemaining);
     updateTimerRing(state.timerRemaining);
-    updateCigBurn();
+    if (!bubbleMode) updateCigBurn();
 
     if (state.timerRemaining <= 0) {
       clearInterval(state.timerInterval);
-      $('#timer-label').textContent = '다 피웠어요! 🚬';
+      $('#timer-label').textContent = bubbleMode ? '다 불었어요! 🫧' : '다 피웠어요! 🚬';
       setTimeout(() => goToScene('scene-ending'), 2000);
     }
   }, 1000);
@@ -391,6 +427,12 @@ function updateCigBurn() {
 // ── Smoke / Bubble Particle System ─────────────
 function isBubbleMode() {
   return state.selectedCig === 'bubble';
+}
+
+function exhaleCopy() {
+  return isBubbleMode()
+    ? { icon: '🫧', label: '후~ 불기',   hint: '클릭할 때마다 비눗방울을 불어요' }
+    : { icon: '💨', label: '후~ 내뱉기', hint: '클릭할 때마다 연기를 내뱉어요' };
 }
 
 function createSmokeParticle(canvas, burst = false, intensity = 1) {
@@ -470,6 +512,10 @@ function triggerExhale(intensity = 1) {
   state.exhaleCount++;
   if (navigator.vibrate) navigator.vibrate(Math.round(40 * Math.min(1.5, intensity)));
 
+  if (isBubbleMode()) {
+    playSfx(intensity >= BUBBLE_STRONG_THRESHOLD ? SFX.bubbleStrong : SFX.bubbleLight);
+  }
+
   const canvas = $('#smoke-canvas');
   const count  = Math.round(18 * Math.min(1.6, Math.max(0.5, intensity)));
   for (let i = 0; i < count; i++) {
@@ -545,7 +591,7 @@ function stopMic() {
     btn.setAttribute('aria-pressed', 'false');
   }
   const hint = $('#exhale-hint');
-  if (hint) hint.textContent = '클릭할 때마다 연기를 내뱉어요';
+  if (hint) hint.textContent = exhaleCopy().hint;
 }
 
 function monitorMic() {
