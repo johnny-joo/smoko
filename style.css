@@ -146,6 +146,43 @@ button, .cig-card, .lighter, .elev-btn, #soap-dip {
 #scene-intro {
   background: radial-gradient(ellipse at 50% 60%, var(--cream-panel-top) 0%, var(--bg-cream) 70%);
 }
+
+/* "오디오를 켜주세요" 안내 배지 — 화면 상단 중앙, 첫 인터랙션 시 사라짐 */
+.audio-hint {
+  position: absolute;
+  top: calc(1.4rem + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #fff;
+  border: 1.5px solid var(--ink);
+  border-radius: 50px;
+  padding: 0.55rem 1.1rem;
+  font-size: clamp(0.72rem, 3.2vw, 0.85rem);
+  font-weight: 600;
+  color: var(--ink);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+  max-width: min(360px, 88vw);
+  text-align: center;
+  cursor: pointer;
+  animation: audioHintFloat 2.4s ease-in-out infinite;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.audio-hint-icon { font-size: 1rem; flex-shrink: 0; }
+@keyframes audioHintFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%      { transform: translateX(-50%) translateY(-4px); }
+}
+.audio-hint.hide {
+  opacity: 0;
+  pointer-events: none;
+  animation: none;
+  transform: translateX(-50%) translateY(-14px);
+}
+
 .intro-bg-text {
   position: absolute;
   font-family: var(--font-display);

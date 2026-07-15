@@ -160,6 +160,13 @@ function onSceneEnter(sceneId) {
 // ────────────────────────────────────────────────
 $('#btn-start').addEventListener('click', () => goToScene('scene-store'));
 
+// 첫 사용자 인터랙션(오디오 자동재생 정책상 소리가 실제로 켜지는 시점) 시 안내 배지 숨김
+function dismissAudioHint() {
+  const hint = $('#audio-hint');
+  if (hint) hint.classList.add('hide');
+}
+document.addEventListener('pointerdown', dismissAudioHint, { once: true });
+
 // ────────────────────────────────────────────────
 // SCENE 1: STORE — cigarette selection
 // ────────────────────────────────────────────────
