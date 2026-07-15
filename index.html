@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>담배 피러가기 🚬</title>
+  <title>SMOKO</title>
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
@@ -31,7 +31,7 @@
       <div class="intro-icon">🚬</div>
       <h1 class="intro-title">담배 피러가기</h1>
       <p class="intro-subtitle">10분간의 달콤한 현실 도피</p>
-      <p class="intro-desc">회사에서 잠깐 빠져나가는 그 시간.<br/>지금 바로 시뮬레이션으로 즐겨보세요.</p>
+      <!-- <p class="intro-desc">회사에서 잠깐 빠져나가는 그 시간.<br/>지금 바로 시뮬레이션으로 즐겨보세요.</p> -->
       <button class="btn-main" id="btn-start">출발하기 →</button>
     </div>
     <div class="intro-bg-text">SMOKE BREAK</div>
@@ -43,7 +43,7 @@
   <section id="scene-store" class="scene">
     <div class="scene-header">
       <span class="scene-label">STEP 1 / 4</span>
-      <h2 class="scene-title">편의점 📦</h2>
+      <h2 class="scene-title">편의점</h2>
       <p class="scene-desc">오늘 뭐 피울까요?</p>
     </div>
 
@@ -89,7 +89,21 @@
       <div class="counter-display" id="counter-display">
         <span class="counter-prompt">← 담배를 골라보세요</span>
       </div>
-      <button class="btn-main" id="btn-buy" disabled>계산하기 💰</button>
+      <button class="btn-main" id="btn-buy" disabled>계산하기</button>
+    </div>
+
+    <div class="staff-widget" id="staff-widget">
+      <div class="staff-bubble" id="staff-bubble">
+        <p id="staff-line"></p>
+      </div>
+      <button class="staff-btn" id="staff-btn">
+        <span class="staff-avatar">
+          <span class="staff-placeholder">🙋</span>
+          <img class="staff-img" src="images/staff.png" alt="편의점 직원"
+               onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">
+        </span>
+        <span class="staff-btn-label">직원 추천받기</span>
+      </button>
     </div>
   </section>
 
@@ -103,11 +117,17 @@
 
       <div class="elevator-interior" id="elevator-interior">
         <div class="elevator-panel">
+          <span class="panel-screw screw-tl"></span>
+          <span class="panel-screw screw-tr"></span>
           <div class="floor-display" id="floor-display">
-            <span class="floor-num" id="floor-num">11</span>
-            <span class="floor-unit">F</span>
+            <div class="floor-indicator" id="floor-indicator">▲</div>
+            <div class="floor-num-row">
+              <span class="floor-num" id="floor-num">10</span>
+              <span class="floor-unit">F</span>
+            </div>
           </div>
-          <div class="floor-indicator" id="floor-indicator">▲</div>
+          <span class="panel-screw screw-bl"></span>
+          <span class="panel-screw screw-br"></span>
         </div>
 
         <div class="elevator-buttons">
@@ -118,7 +138,7 @@
 
         <div class="elevator-msg" id="elevator-msg">
           <p>77F 옥상 정원으로</p>
-          <p>올라가는 중...</p>
+          <p>순식간에 올라가는 중... </p>
         </div>
 
         <div class="cig-packet-in-hand" id="cig-packet">
@@ -129,7 +149,7 @@
     </div>
 
     <div class="scene-overlay-text" id="elev-overlay">
-      <h2>엘리베이터 탑승 🛗</h2>
+      <h2>엘리베이터 탑승</h2>
       <p>77F 옥상 정원으로 올라갑니다</p>
     </div>
   </section>
@@ -197,9 +217,66 @@
   <!-- ───────────────────────────────────────────
        SCENE 4: 흡연 중 - 타이머 & 연기 뱉기
   ─────────────────────────────────────────── -->
-  <section id="scene-smoke" class="scene">
+  <section id="scene-smoke" class="scene bg-rooftop">
     <div class="smoke-bg">
+      <div class="smoke-rooftop-bg" id="smoke-rooftop-bg">
+        <div class="rooftop-sky">
+          <div class="rooftop-moon"></div>
+          <span class="star star-1"></span>
+          <span class="star star-2"></span>
+          <span class="star star-3"></span>
+          <span class="star star-4"></span>
+          <span class="star star-5"></span>
+          <span class="star star-6"></span>
+          <div class="cloud cloud-1">☁</div>
+          <div class="cloud cloud-2">☁</div>
+        </div>
+        <div class="rooftop-skyline">
+          <span class="building b1"></span>
+          <span class="building b2"></span>
+          <span class="building b3"></span>
+          <span class="building b4"></span>
+          <span class="building b5"></span>
+          <span class="building b6"></span>
+          <span class="building b7"></span>
+          <span class="building b8"></span>
+          <span class="building b9"></span>
+        </div>
+        <div class="rooftop-floor">
+          <div class="rooftop-rail"></div>
+          <div class="rooftop-plant">🪴</div>
+          <div class="rooftop-plant">🌿</div>
+        </div>
+      </div>
       <canvas id="smoke-canvas"></canvas>
+      <div class="smoke-friends-row" id="smoke-friends-row">
+        <div class="friend-slot">
+          <span class="friend-placeholder">🧑</span>
+          <img class="friend-char" src="images/friend-1.png" alt="동료 1"
+               onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">
+        </div>
+        <div class="friend-slot friend-slot-main">
+          <span class="friend-placeholder">🧑‍💼</span>
+          <img class="friend-char friend-char-main" src="images/friend-2.png" alt="동료 2"
+               onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">
+        </div>
+        <div class="friend-slot">
+          <span class="friend-placeholder">👩</span>
+          <img class="friend-char" src="images/friend-3.png" alt="동료 3"
+               onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">
+        </div>
+      </div>
+    </div>
+
+    <button class="bg-nav bg-nav-left" id="bg-prev" aria-label="이전 배경">‹</button>
+    <button class="bg-nav bg-nav-right" id="bg-next" aria-label="다음 배경">›</button>
+    <div class="bg-indicator" id="bg-indicator">
+      <span class="bg-label" id="bg-label">옥상 그대로</span>
+      <span class="bg-dots">
+        <span class="bg-dot active" data-idx="0"></span>
+        <span class="bg-dot" data-idx="1"></span>
+        <span class="bg-dot" data-idx="2"></span>
+      </span>
     </div>
 
     <div class="smoke-header">

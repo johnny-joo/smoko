@@ -283,6 +283,65 @@ button, .cig-card, .lighter, .elev-btn, #soap-dip {
   line-height: 1.5;
 }
 
+/* ── 직원 추천받기 위젯 (화면 오른쪽 하단 고정) ───────
+   images/staff.png 를 넣으면 🙋 플레이스홀더 대신 자동으로 표시됨 */
+.staff-widget {
+  position: absolute;
+  right: calc(1rem + env(safe-area-inset-right, 0px));
+  bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  max-width: min(260px, 60vw);
+}
+.staff-bubble {
+  align-self: flex-end;
+  background: linear-gradient(180deg, var(--cream-panel-top) 0%, var(--cream-panel-bottom) 100%);
+  border: 1px solid var(--cream-border);
+  border-radius: 16px 16px 4px 16px;
+  padding: 0.7rem 1rem;
+  font-size: 0.82rem;
+  color: var(--ink);
+  line-height: 1.5;
+  box-shadow: 0 6px 18px rgba(90,70,30,0.18);
+  opacity: 0;
+  transform: translateY(6px) scale(0.96);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+.staff-bubble.show { opacity: 1; transform: translateY(0) scale(1); }
+.staff-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(180deg, var(--cream-panel-top) 0%, var(--cream-panel-bottom) 100%);
+  border: 1px solid var(--cream-border);
+  border-radius: 50px;
+  padding: 0.4rem 1rem 0.4rem 0.4rem;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(90,70,30,0.18);
+  font-family: var(--font-main);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink);
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+.staff-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(90,70,30,0.26); }
+.staff-btn:active { transform: translateY(0); }
+.staff-avatar {
+  position: relative;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--wood);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.staff-placeholder { font-size: 1.1rem; }
+.staff-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
 /* ================================================
    SCENE 2: ELEVATOR
    ================================================ */
@@ -335,31 +394,62 @@ button, .cig-card, .lighter, .elev-btn, #soap-dip {
   padding: 1.5rem 1rem 1rem;
 }
 .elevator-panel {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.4rem;
+  background: linear-gradient(180deg, #c9cdd1 0%, #9aa0a6 100%);
+  border-radius: 10px;
+  padding: 1rem 0.9rem;
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.5), inset 0 -3px 6px rgba(0,0,0,0.25), 0 4px 14px rgba(0,0,0,0.35);
 }
+.panel-screw {
+  position: absolute;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #eee, #6a6e72 70%);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.5);
+}
+.screw-tl { top: 6px; left: 6px; }
+.screw-tr { top: 6px; right: 6px; }
+.screw-bl { bottom: 6px; left: 6px; }
+.screw-br { bottom: 6px; right: 6px; }
+
 .floor-display {
-  background: #000;
-  border: 2px solid #444;
+  background: #050505;
+  border: 3px solid #34383b;
   border-radius: 6px;
-  padding: 0.4rem 1rem;
+  padding: 0.55rem 1.3rem;
   display: flex;
-  align-items: baseline;
-  gap: 0.2rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.85);
 }
+.floor-num-row { display: flex; align-items: baseline; gap: 0.2rem; }
 .floor-num {
   font-family: 'Courier New', monospace;
   font-size: 2.2rem;
   font-weight: 700;
-  color: #f5a623;
+  color: #ff3b30;
+  text-shadow: 0 0 8px rgba(255,59,48,0.7);
   line-height: 1;
   transition: all 0.3s;
 }
-.floor-unit { font-size: 0.9rem; color: #f5a623; opacity: 0.7; }
-.floor-indicator { font-size: 1.2rem; color: var(--accent); animation: blink 1s step-end infinite; }
+.floor-unit { font-size: 0.9rem; color: #ff3b30; text-shadow: 0 0 6px rgba(255,59,48,0.6); opacity: 0.8; }
+.floor-indicator { font-size: 1.2rem; color: #ff3b30; text-shadow: 0 0 6px rgba(255,59,48,0.8); animation: blink 1s step-end infinite; }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+/* comic rapid floor-count effect while the elevator "flies" up to the roof */
+.floor-display.spinning .floor-num {
+  animation: floorSpin 0.1s linear infinite;
+}
+@keyframes floorSpin {
+  0%   { transform: translateY(0) scaleY(1); filter: blur(0); }
+  50%  { transform: translateY(-3px) scaleY(1.1); filter: blur(0.6px); }
+  100% { transform: translateY(0) scaleY(1); filter: blur(0); }
+}
 
 .elevator-buttons {
   display: flex;
@@ -635,8 +725,7 @@ button, .cig-card, .lighter, .elev-btn, #soap-dip {
 @keyframes filmPop { 0% { transform: scale(0.6); opacity: 0.4; } 60% { transform: scale(1.15); } 100% { transform: scale(1); opacity: 1; } }
 
 .bubble-wand-burning {
-  transform: scale(0.72);
-  margin-left: 0.5rem;
+  transform: scale(0.9);
 }
 .lit-message {
   position: relative; z-index: 2;
@@ -653,11 +742,107 @@ button, .cig-card, .lighter, .elev-btn, #soap-dip {
    SCENE 4: SMOKING + TIMER
    ================================================ */
 #scene-smoke {
-  background: radial-gradient(ellipse at 50% 70%, #1a2a1a 0%, #0a0f0a 70%);
   gap: 0;
   padding: calc(1.5rem + env(safe-area-inset-top, 0px)) calc(1rem + env(safe-area-inset-right, 0px)) calc(1.5rem + env(safe-area-inset-bottom, 0px)) calc(1rem + env(safe-area-inset-left, 0px));
   justify-content: flex-start;
+  transition: background 0.5s ease;
 }
+#scene-smoke.bg-rooftop { background: linear-gradient(180deg, #2b1f3d 0%, #3a2a4a 25%, #55345a 45%, #2a2035 70%, #0d0f14 100%); }
+#scene-smoke.bg-cream   { background: radial-gradient(ellipse at 50% 60%, var(--cream-panel-top) 0%, var(--bg-cream) 70%); }
+#scene-smoke.bg-friends { background: radial-gradient(ellipse at 50% 75%, #2a2418 0%, #14100a 70%); }
+
+/* ── "옥상 그대로" 배경: 노을 진 야경 옥상 일러스트 ─────── */
+.smoke-rooftop-bg { display: none; position: absolute; inset: 0; overflow: hidden; }
+#scene-smoke.bg-rooftop .smoke-rooftop-bg { display: block; }
+
+.rooftop-sky {
+  position: absolute; top: 0; left: 0; right: 0; height: 68%;
+  overflow: hidden;
+}
+.rooftop-sky .cloud { opacity: 0.22; filter: brightness(0.7); }
+.rooftop-moon {
+  position: absolute; top: 10%; right: 14%;
+  width: 46px; height: 46px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff9e6, #f5e6a8 60%, #e8d47a 100%);
+  box-shadow: 0 0 30px rgba(245,230,168,0.5);
+}
+.star {
+  position: absolute;
+  width: 2px; height: 2px;
+  background: #fff;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: starTwinkle 3s ease-in-out infinite;
+}
+.star-1 { top: 10%; left: 15%; animation-delay: 0s; }
+.star-2 { top: 20%; left: 70%; animation-delay: 0.6s; }
+.star-3 { top: 8%;  left: 45%; animation-delay: 1.2s; }
+.star-4 { top: 30%; left: 85%; animation-delay: 1.8s; }
+.star-5 { top: 15%; left: 30%; animation-delay: 0.3s; }
+.star-6 { top: 25%; left: 58%; animation-delay: 2.1s; }
+@keyframes starTwinkle { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+
+.rooftop-skyline {
+  position: absolute;
+  bottom: 30%; left: 0; right: 0;
+  height: 140px;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  padding: 0 4%;
+}
+.building {
+  flex: 1;
+  background: linear-gradient(180deg, #241f36 0%, #14111f 100%);
+  border-radius: 1px 1px 0 0;
+  position: relative;
+}
+.building::before {
+  content: '';
+  position: absolute; top: 16%; left: 18%; right: 18%; bottom: 20%;
+  background-image: radial-gradient(circle, rgba(255,205,120,0.55) 1px, transparent 1.6px);
+  background-size: 7px 9px;
+  opacity: 0.75;
+}
+.b1 { height: 55%; } .b2 { height: 80%; } .b3 { height: 40%; }
+.b4 { height: 95%; } .b5 { height: 60%; } .b6 { height: 75%; }
+.b7 { height: 45%; } .b8 { height: 88%; } .b9 { height: 65%; }
+
+.rooftop-floor {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 30%;
+  background: linear-gradient(180deg, #171220 0%, #0a0710 100%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 12% 0.6rem;
+}
+.rooftop-rail {
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: rgba(255,255,255,0.08);
+}
+.rooftop-plant { font-size: 1.8rem; opacity: 0.85; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
+
+/* light background needs dark text/UI to stay readable */
+#scene-smoke.bg-cream .smoke-header h2,
+#scene-smoke.bg-cream .timer-display,
+#scene-smoke.bg-cream .timer-label,
+#scene-smoke.bg-cream .exhale-hint,
+#scene-smoke.bg-cream .thought-bubble p {
+  color: var(--ink);
+}
+#scene-smoke.bg-cream .timer-bg-circle { stroke: rgba(51,48,42,0.12); }
+#scene-smoke.bg-cream .btn-exhale {
+  background: rgba(51,48,42,0.06);
+  border-color: rgba(51,48,42,0.18);
+  color: var(--ink);
+}
+#scene-smoke.bg-cream .btn-exhale:hover { background: rgba(51,48,42,0.1); box-shadow: 0 0 20px rgba(51,48,42,0.08); }
+#scene-smoke.bg-cream .thought-bubble { background: rgba(51,48,42,0.05); border-color: rgba(51,48,42,0.14); }
+#scene-smoke.bg-cream .btn-skip,
+#scene-smoke.bg-cream .btn-mic { color: var(--ink-muted); border-color: var(--cream-border); }
+#scene-smoke.bg-cream .btn-skip:hover,
+#scene-smoke.bg-cream .btn-mic:hover { color: var(--ink); border-color: var(--wood); }
+
 .smoke-bg {
   position: absolute;
   inset: 0;
@@ -666,6 +851,100 @@ button, .cig-card, .lighter, .elev-btn, #soap-dip {
 #smoke-canvas {
   width: 100%; height: 100%;
   opacity: 0.6;
+}
+
+/* ── background switcher (‹ › arrows) ─────────── */
+.bg-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--text);
+  font-size: 1.4rem;
+  line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: background 0.15s, transform 0.15s, border-color 0.2s;
+}
+.bg-nav:hover { background: rgba(255,255,255,0.16); }
+.bg-nav:active { transform: translateY(-50%) scale(0.88); }
+.bg-nav-left  { left: calc(0.6rem + env(safe-area-inset-left, 0px)); }
+.bg-nav-right { right: calc(0.6rem + env(safe-area-inset-right, 0px)); }
+#scene-smoke.bg-cream .bg-nav { background: rgba(51,48,42,0.06); border-color: rgba(51,48,42,0.18); color: var(--ink); }
+#scene-smoke.bg-cream .bg-nav:hover { background: rgba(51,48,42,0.12); }
+
+.bg-indicator {
+  position: absolute;
+  top: calc(0.8rem + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+.bg-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14);
+  padding: 0.2rem 0.7rem;
+  border-radius: 20px;
+  backdrop-filter: blur(6px);
+}
+#scene-smoke.bg-cream .bg-label { color: var(--ink-muted); background: rgba(51,48,42,0.05); border-color: rgba(51,48,42,0.14); }
+.bg-dots { display: flex; gap: 0.35rem; }
+.bg-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  transition: background 0.2s, transform 0.2s;
+}
+.bg-dot.active { background: var(--accent); transform: scale(1.3); }
+#scene-smoke.bg-cream .bg-dot { background: rgba(51,48,42,0.25); }
+#scene-smoke.bg-cream .bg-dot.active { background: var(--accent-ink); }
+
+/* ── "다 같이 피기" 배경: 옆에 서 있는 동료 캐릭터 자리 ─────
+   images/friend-1.png, images/friend-2.png, images/friend-3.png 를
+   투명 배경 PNG로 넣으면 아래 점선 플레이스홀더 대신 자동으로 표시됨 */
+.smoke-friends-row {
+  display: none;
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 8%;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 1.2rem;
+  z-index: 1;
+}
+#scene-smoke.bg-friends .smoke-friends-row { display: flex; }
+.friend-slot {
+  position: relative;
+  width: 78px; height: 110px;
+}
+.friend-slot-main { width: 92px; height: 128px; }
+.friend-placeholder {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem;
+  border: 2px dashed rgba(255,255,255,0.3);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.55);
+}
+.friend-char {
+  position: relative;
+  z-index: 1;
+  width: 100%; height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.5));
 }
 .smoke-header {
   text-align: center;
@@ -721,42 +1000,47 @@ button, .cig-card, .lighter, .elev-btn, #soap-dip {
   position: relative; z-index: 2;
 }
 
-/* burning cigarette */
+/* burning cigarette — held upright as if the player is actually smoking it */
 .cig-burning-area {
   position: relative; z-index: 2;
   display: flex;
   justify-content: center;
+  align-items: flex-end;
+  height: 176px;
   margin-bottom: 1rem;
 }
 .cig-burning {
   display: flex;
+  flex-direction: column-reverse;
   align-items: center;
-  height: 20px;
+  width: 22px;
   filter: drop-shadow(0 0 8px rgba(255,100,0,0.6));
 }
 .cig-burning-filter {
-  width: 40px; height: 100%;
-  background: linear-gradient(90deg, #c0875a, #e8a882);
-  border-radius: 10px 0 0 10px;
+  width: 100%; height: 40px;
+  background: linear-gradient(180deg, #e8a882, #c0875a);
+  border-radius: 0 0 10px 10px;
+  flex-shrink: 0;
 }
 .cig-burning-body {
-  height: 100%;
-  background: linear-gradient(180deg, #f0ece4 0%, #e0d8c8 100%);
-  transition: width 1s linear;
-  width: 120px;
+  width: 100%;
+  background: linear-gradient(180deg, #e0d8c8 0%, #f0ece4 100%);
+  transition: height 1s linear;
+  height: 120px;
 }
 .cig-burning-ash {
-  height: 100%;
-  background: linear-gradient(180deg, #888 0%, #666 100%);
-  width: 0;
-  transition: width 1s linear;
-  max-width: 40px;
+  width: 100%;
+  background: linear-gradient(180deg, #666 0%, #888 100%);
+  height: 0;
+  transition: height 1s linear;
+  max-height: 40px;
 }
 .cig-burning-ember {
-  width: 12px; height: 100%;
+  width: 100%; height: 12px;
   display: flex; align-items: center; justify-content: center;
-  border-radius: 0 10px 10px 0;
+  border-radius: 10px 10px 0 0;
   background: #ff4400;
+  flex-shrink: 0;
 }
 .ember-glow {
   width: 8px; height: 8px;
@@ -789,9 +1073,25 @@ button, .cig-card, .lighter, .elev-btn, #soap-dip {
   gap: 0.6rem;
   transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
   backdrop-filter: blur(8px);
+  user-select: none;
+  -webkit-user-select: none;
 }
 .btn-exhale:hover { background: rgba(255,255,255,0.14); box-shadow: 0 0 20px rgba(255,255,255,0.1); }
 .btn-exhale:active { transform: scale(0.95); }
+.btn-exhale.holding {
+  background: rgba(255,255,255,0.2);
+  border-color: rgba(255,255,255,0.4);
+  box-shadow: 0 0 28px rgba(255,255,255,0.25);
+  animation: exhaleHoldPulse 1s ease-in-out infinite;
+}
+@keyframes exhaleHoldPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(255,255,255,0.18); }
+  50%      { box-shadow: 0 0 32px rgba(255,255,255,0.32); }
+}
+#scene-smoke.bg-cream .btn-exhale.holding {
+  background: rgba(51,48,42,0.16);
+  border-color: rgba(51,48,42,0.3);
+}
 .exhale-icon { font-size: 1.4rem; }
 .exhale-hint { font-size: 0.72rem; color: var(--text-muted); }
 

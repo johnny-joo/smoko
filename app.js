@@ -169,7 +169,45 @@ function initStore() {
   state.selectedCig = null;
   $('#btn-buy').disabled = true;
   $('#counter-display').innerHTML = '<span class="counter-prompt">← 담배를 골라보세요</span>';
+
+  // reset staff recommendation bubble
+  clearTimeout(staffBubbleTimeout);
+  $('#staff-bubble').classList.remove('show');
 }
+
+// ── Staff Recommendation ───────────────────────
+const STAFF_LINES = [
+  '오늘같이 훈훈한 날엔 에쎄 체인지 어때요? 멘솔이 깔끔해요.',
+  '스트레스 제대로 풀고 싶으면 말보로 레드가 진리죠.',
+  '점심 드셨으면 레종 블루로 가볍게 가시죠.',
+  '머리 띵할 때는 토브플러스 아이스만 한 게 없어요.',
+  '부담 없이 즐기시려면 LM 실버 추천드려요.',
+  '오늘은 그냥... 비눗방울 어때요? 숨 크게 한 번 쉬어봐요.',
+  '단골이시니까 특별히 말씀드리는데, 오늘의 특선 한번 믿어보세요.',
+];
+let lastStaffIdx = -1;
+let staffBubbleTimeout = null;
+
+function staffRecommend() {
+  let idx;
+  do { idx = Math.floor(Math.random() * STAFF_LINES.length); } while (idx === lastStaffIdx && STAFF_LINES.length > 1);
+  lastStaffIdx = idx;
+
+  const bubble = $('#staff-bubble');
+  const text   = $('#staff-line');
+  bubble.classList.remove('show');
+  clearTimeout(staffBubbleTimeout);
+
+  setTimeout(() => {
+    text.textContent = STAFF_LINES[idx];
+    bubble.classList.add('show');
+    staffBubbleTimeout = setTimeout(() => bubble.classList.remove('show'), 6000);
+  }, 120);
+
+  if (navigator.vibrate) navigator.vibrate(20);
+}
+
+$('#staff-btn').addEventListener('click', staffRecommend);
 
 $$('.cig-card').forEach(card => {
   card.addEventListener('click', () => {
@@ -200,6 +238,8 @@ $('#btn-buy').addEventListener('click', () => {
 // ────────────────────────────────────────────────
 // SCENE 2: ELEVATOR
 // ────────────────────────────────────────────────
+let elevatorTimer = null;
+
 function initElevator() {
   const cig = CIG_DATA[state.selectedCig];
 
@@ -217,32 +257,42 @@ function initElevator() {
   playSfx(SFX.elevatorEnter);
   playLoop(SFX.elevatorRide);
 
-  // floor countdown: 11 → 77 (rooftop)
+  // 10층에서 시작해 77층(옥상)까지 코믹하게 순식간에 튀어오르는 층수 연출
   const floorNum = $('#floor-num');
   const floorIndicator = $('#floor-indicator');
-  const floorSequence = [11, 22, 33, 44, 55, 66, 77];
-  let idx = 0;
-  floorNum.textContent = floorSequence[0];
+  const floorDisplay = $('#floor-display');
+  const TARGET_FLOOR = 77;
 
-  const floorTimer = setInterval(() => {
-    idx++;
-    if (idx < floorSequence.length) {
-      floorNum.textContent = floorSequence[idx];
-      if (floorSequence[idx] === 77) {
-        floorIndicator.textContent = '●';
-        floorIndicator.style.animation = 'none';
-        clearInterval(floorTimer);
-        stopSfx(SFX.elevatorRide);
-        // doors open, then transition
-        setTimeout(() => {
-          doorL.classList.add('open');
-          doorR.classList.add('open');
-          playSfx(SFX.walking);
-          setTimeout(() => goToScene('scene-garden'), 1800);
-        }, 700);
-      }
+  if (elevatorTimer) clearInterval(elevatorTimer);
+  floorIndicator.textContent = '▲';
+  floorIndicator.style.animation = '';
+  floorDisplay.classList.add('spinning');
+
+  let floor = 10;
+  floorNum.textContent = floor;
+
+  elevatorTimer = setInterval(() => {
+    floor += Math.floor(Math.random() * 5) + 4; // 4~8층씩 코믹하게 순간 점프
+    if (floor >= TARGET_FLOOR) {
+      floor = TARGET_FLOOR;
+      floorNum.textContent = floor;
+      floorDisplay.classList.remove('spinning');
+      floorIndicator.textContent = '●';
+      floorIndicator.style.animation = 'none';
+      clearInterval(elevatorTimer);
+      elevatorTimer = null;
+      stopSfx(SFX.elevatorRide);
+      // doors open, then transition
+      setTimeout(() => {
+        doorL.classList.add('open');
+        doorR.classList.add('open');
+        playSfx(SFX.walking);
+        setTimeout(() => goToScene('scene-garden'), 1800);
+      }, 700);
+      return;
     }
-  }, 800);
+    floorNum.textContent = floor;
+  }, 45);
 }
 
 // ────────────────────────────────────────────────
@@ -327,9 +377,31 @@ let smokeParticles = [];
 let animFrame = null;
 let thoughtTimeout = null;
 
+// ── Background Switcher (‹ › 로 옥상/베이지/다 같이 피기 전환) ──
+const SMOKE_BACKGROUNDS = [
+  { cls: 'bg-rooftop', label: '옥상 그대로' },
+  { cls: 'bg-cream',   label: '따뜻한 베이지' },
+  { cls: 'bg-friends', label: '다 같이 피기' },
+];
+let smokeBgIndex = 0;
+
+function applySmokeBg(idx) {
+  smokeBgIndex = ((idx % SMOKE_BACKGROUNDS.length) + SMOKE_BACKGROUNDS.length) % SMOKE_BACKGROUNDS.length;
+  const scene = $('#scene-smoke');
+  SMOKE_BACKGROUNDS.forEach((bg) => scene.classList.remove(bg.cls));
+  scene.classList.add(SMOKE_BACKGROUNDS[smokeBgIndex].cls);
+  $('#bg-label').textContent = SMOKE_BACKGROUNDS[smokeBgIndex].label;
+  $$('.bg-dot').forEach((dot, i) => dot.classList.toggle('active', i === smokeBgIndex));
+}
+
+$('#bg-prev').addEventListener('click', () => applySmokeBg(smokeBgIndex - 1));
+$('#bg-next').addEventListener('click', () => applySmokeBg(smokeBgIndex + 1));
+
 function initSmoke() {
   // reset state
   stopMic();
+  stopExhaleHold();
+  applySmokeBg(0);
   const bubbleMode = isBubbleMode();
   state.timerRemaining = state.timerDuration;
   state.exhaleCount = 0;
@@ -347,8 +419,8 @@ function initSmoke() {
   $('#bubble-wand-burning').style.display = bubbleMode ? 'flex' : 'none';
 
   // reset cigarette visual
-  $('#cig-burn-body').style.width = '120px';
-  $('#cig-ash').style.width = '0px';
+  $('#cig-burn-body').style.height = '120px';
+  $('#cig-ash').style.height = '0px';
 
   // exhale button / hint copy
   const copy = exhaleCopy();
@@ -418,10 +490,10 @@ function updateCigBurn() {
   const pct     = elapsed / state.timerDuration;
   const maxBody = 120;
   const maxAsh  = 40;
-  const bodyWidth = Math.max(0, maxBody - pct * (maxBody + maxAsh));
-  const ashWidth  = Math.min(maxAsh, pct * (maxBody + maxAsh));
-  $('#cig-burn-body').style.width = bodyWidth + 'px';
-  $('#cig-ash').style.width = ashWidth + 'px';
+  const bodyHeight = Math.max(0, maxBody - pct * (maxBody + maxAsh));
+  const ashHeight  = Math.min(maxAsh, pct * (maxBody + maxAsh));
+  $('#cig-burn-body').style.height = bodyHeight + 'px';
+  $('#cig-ash').style.height = ashHeight + 'px';
 }
 
 // ── Smoke / Bubble Particle System ─────────────
@@ -431,8 +503,8 @@ function isBubbleMode() {
 
 function exhaleCopy() {
   return isBubbleMode()
-    ? { icon: '🫧', label: '후~ 불기',   hint: '클릭할 때마다 비눗방울을 불어요' }
-    : { icon: '💨', label: '후~ 내뱉기', hint: '클릭할 때마다 연기를 내뱉어요' };
+    ? { icon: '🫧', label: '후~ 불기',   hint: '버튼을 꾹 누르고 있으면 비눗방울이 나와요' }
+    : { icon: '💨', label: '후~ 내뱉기', hint: '버튼을 꾹 누르고 있으면 연기가 나와요' };
 }
 
 function createSmokeParticle(canvas, burst = false, intensity = 1) {
@@ -507,7 +579,8 @@ function renderSmoke(canvas, ctx) {
 }
 
 // ── Exhale / Blow Interaction ──────────────────
-// intensity: 1 = 기본 버튼 세기. 마이크 감지 시 숨 세기에 따라 0.4~1.8 범위로 전달됨.
+// intensity: 1 = 기본 세기. 마이크 감지 시 숨 세기에 따라 0.4~1.8 범위로 전달됨.
+// 마이크로 감지된 한 번의 "훅" 은 즉발성 이벤트라 기존처럼 한 번에 큰 파티클 버스트를 낸다.
 function triggerExhale(intensity = 1) {
   state.exhaleCount++;
   if (navigator.vibrate) navigator.vibrate(Math.round(40 * Math.min(1.5, intensity)));
@@ -516,21 +589,73 @@ function triggerExhale(intensity = 1) {
     playSfx(intensity >= BUBBLE_STRONG_THRESHOLD ? SFX.bubbleStrong : SFX.bubbleLight);
   }
 
-  const canvas = $('#smoke-canvas');
-  const count  = Math.round(18 * Math.min(1.6, Math.max(0.5, intensity)));
-  for (let i = 0; i < count; i++) {
-    smokeParticles.push(createSmokeParticle(canvas, true, intensity));
-  }
+  emitSmokePuff(intensity, 18);
 
   // button animation
   const btn = $('#btn-exhale');
-  btn.style.transform = `scale(${0.92 - Math.min(0.1, intensity * 0.03)})`;
   setTimeout(() => { btn.style.transform = ''; }, 120);
 
   showThought();
 }
 
-$('#btn-exhale').addEventListener('click', () => triggerExhale(1));
+function emitSmokePuff(intensity = 1, baseCount = 6) {
+  const canvas = $('#smoke-canvas');
+  const count  = Math.max(2, Math.round(baseCount * Math.min(1.6, Math.max(0.5, intensity))));
+  for (let i = 0; i < count; i++) {
+    smokeParticles.push(createSmokeParticle(canvas, true, intensity));
+  }
+
+  const btn = $('#btn-exhale');
+  btn.style.transform = `scale(${0.94 - Math.min(0.08, intensity * 0.025)})`;
+}
+
+// 버튼(또는 스페이스바)을 꾹 누르고 있는 동안 계속 연기가 나오도록 하는 연출.
+// 누르는 순간 한 번만 카운트·생각풍선·효과음을 처리하고, 누르고 있는 동안은
+// emitSmokePuff로 파티클만 계속 흘려보내 오래 불수록 더 진하게 나오게 한다.
+let exhaleHoldInterval = null;
+let exhaleHoldStart = 0;
+let exhaleStrongPlayed = false;
+const EXHALE_TICK_MS = 90;
+
+function startExhaleHold() {
+  if (exhaleHoldInterval) return;
+
+  state.exhaleCount++;
+  if (navigator.vibrate) navigator.vibrate(25);
+  exhaleStrongPlayed = false;
+  if (isBubbleMode()) playSfx(SFX.bubbleLight);
+  showThought();
+
+  $('#btn-exhale').classList.add('holding');
+  exhaleHoldStart = performance.now();
+  emitSmokePuff(0.6, 6);
+
+  exhaleHoldInterval = setInterval(() => {
+    const heldMs = performance.now() - exhaleHoldStart;
+    const intensity = Math.min(1.8, 0.6 + heldMs / 1500);
+    emitSmokePuff(intensity, 6);
+    if (isBubbleMode() && !exhaleStrongPlayed && intensity >= BUBBLE_STRONG_THRESHOLD) {
+      exhaleStrongPlayed = true;
+      playSfx(SFX.bubbleStrong);
+    }
+  }, EXHALE_TICK_MS);
+}
+
+function stopExhaleHold() {
+  if (!exhaleHoldInterval) return;
+  clearInterval(exhaleHoldInterval);
+  exhaleHoldInterval = null;
+  const btn = $('#btn-exhale');
+  btn.classList.remove('holding');
+  btn.style.transform = '';
+}
+
+const exhaleBtn = $('#btn-exhale');
+exhaleBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); startExhaleHold(); });
+['pointerup', 'pointercancel', 'pointerleave'].forEach((evt) => {
+  exhaleBtn.addEventListener(evt, stopExhaleHold);
+});
+window.addEventListener('blur', stopExhaleHold);
 
 // ── Mic Blow Detection ─────────────────────────
 // 마이크로 숨 세기를 측정해서 세게 불수록 연기를 더 세게/많이 뱉도록 연결.
@@ -654,6 +779,7 @@ function scheduleThought() {
 $('#btn-skip-timer').addEventListener('click', () => {
   if (state.timerInterval) clearInterval(state.timerInterval);
   clearTimeout(thoughtTimeout);
+  stopExhaleHold();
   goToScene('scene-ending');
 });
 
@@ -665,6 +791,7 @@ function initEnding() {
   cancelAnimationFrame(animFrame);
   clearTimeout(thoughtTimeout);
   stopMic();
+  stopExhaleHold();
   stopAllSfx();
 
   const cig       = CIG_DATA[state.selectedCig] || { name: '???' };
@@ -689,6 +816,7 @@ $('#btn-restart').addEventListener('click', () => {
   if (state.timerInterval) clearInterval(state.timerInterval);
   cancelAnimationFrame(animFrame);
   clearTimeout(thoughtTimeout);
+  stopExhaleHold();
   state.selectedCig = null;
   goToScene('scene-intro');
 });
@@ -721,7 +849,12 @@ if ('serviceWorker' in navigator) {
 document.addEventListener('keydown', (e) => {
   if (e.code === 'Space' && currentScene === 'scene-smoke') {
     e.preventDefault();
-    $('#btn-exhale').click();
+    if (!e.repeat) startExhaleHold();
+  }
+});
+document.addEventListener('keyup', (e) => {
+  if (e.code === 'Space' && currentScene === 'scene-smoke') {
+    stopExhaleHold();
   }
 });
 
