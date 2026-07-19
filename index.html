@@ -9,17 +9,14 @@
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#EEEBE2" />
   <link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png" />
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="apple-touch-icon" href="icons/icon-smoko.png" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="담배 피러가기" />
+  <meta name="apple-mobile-web-app-title" content="smoko" />
   <meta name="format-detection" content="telephone=no" />
 
   <link rel="stylesheet" href="style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Black+Han+Sans&display=swap" rel="stylesheet" />
 </head>
 <body>
 
@@ -96,7 +93,7 @@
       <button class="btn-main" id="btn-buy" disabled>계산하기</button>
     </div>
 
-    <div class="staff-widget" id="staff-widget">
+    <!-- <div class="staff-widget" id="staff-widget">
       <div class="staff-bubble" id="staff-bubble">
         <p id="staff-line"></p>
       </div>
@@ -108,7 +105,7 @@
         </span>
         <span class="staff-btn-label">직원 추천받기</span>
       </button>
-    </div>
+    </div> -->
   </section>
 
   <!-- ───────────────────────────────────────────
@@ -222,10 +219,17 @@
        SCENE 4: 흡연 중 - 타이머 & 연기 뱉기
   ─────────────────────────────────────────── -->
   <section id="scene-smoke" class="scene bg-rooftop">
+    <!-- 팀장 피하기: 랜덤으로 잠깐 나타났다 구석으로 숨는 코미디 연출용 (일러스트 준비 중 — images/boss.png 넣으면 자동 교체) -->
+    <div class="boss-peek" id="boss-peek">
+      <span class="boss-placeholder">🕴️</span>
+      <img class="boss-img" src="images/boss.png" alt="팀장"
+           onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">
+    </div>
+
     <div class="smoke-bg">
       <div class="smoke-rooftop-bg" id="smoke-rooftop-bg">
         <div class="rooftop-sky">
-          <div class="rooftop-moon"></div>
+          <div class="rooftop-sun"></div>
           <span class="star star-1"></span>
           <span class="star star-2"></span>
           <span class="star star-3"></span>
@@ -360,6 +364,66 @@
       <div class="ending-buttons">
         <button class="btn-main" id="btn-restart">다시 피러가기 🚬</button>
         <button class="btn-sub" id="btn-back-work">업무 복귀 💻</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────────────────────────────────────
+       SCENE 6: 사무실 - 집중 시간 고르기
+  ─────────────────────────────────────────── -->
+  <section id="scene-office" class="scene">
+    <div class="office-bg">
+      <div class="office-partition"></div>
+      <div class="office-desk">
+        <div class="office-laptop">
+          <div class="laptop-screen"><div class="laptop-glow"></div></div>
+          <div class="laptop-base"></div>
+        </div>
+        <span class="office-plant">🪴</span>
+        <span class="office-cup">☕</span>
+      </div>
+    </div>
+
+    <div class="scene-header" id="office-header">
+      <span class="scene-label">FOCUS TIME</span>
+      <h2 class="scene-title">다시 집중할 시간</h2>
+      <p class="scene-desc">얼마나 집중해볼까요?</p>
+    </div>
+
+    <div class="focus-picker" id="focus-picker">
+      <button class="focus-option" data-mins="25">
+        <span class="focus-option-num">25</span>
+        <span class="focus-option-unit">분</span>
+        <span class="focus-option-desc">짧고 굵게</span>
+      </button>
+      <button class="focus-option" data-mins="50">
+        <span class="focus-option-num">50</span>
+        <span class="focus-option-unit">분</span>
+        <span class="focus-option-desc">제대로 몰입</span>
+      </button>
+    </div>
+
+    <div class="focus-timer-area" id="focus-timer-area">
+      <div class="timer-ring">
+        <svg class="timer-svg" viewBox="0 0 200 200" aria-label="집중 타이머">
+          <circle class="timer-bg-circle" cx="100" cy="100" r="88" />
+          <circle class="timer-progress-circle" id="focus-timer-circle" cx="100" cy="100" r="88" />
+        </svg>
+        <div class="timer-display">
+          <span id="focus-timer-min">25</span>:<span id="focus-timer-sec">00</span>
+        </div>
+      </div>
+      <p class="timer-label" id="focus-timer-label">집중하는 중...</p>
+      <button class="btn-skip" id="btn-focus-stop">그만하기</button>
+    </div>
+
+    <div class="focus-done" id="focus-done">
+      <div class="ending-icon">🎉</div>
+      <h2 class="ending-title">수고하셨어요!</h2>
+      <p class="ending-sub" id="focus-done-sub"></p>
+      <div class="ending-buttons">
+        <button class="btn-main" id="btn-focus-restart">다시 집중하기</button>
+        <button class="btn-sub" id="btn-focus-exit">오늘은 여기까지</button>
       </div>
     </div>
   </section>

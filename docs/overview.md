@@ -25,6 +25,7 @@ smoke-break-pomodoro/
 ├── assets/           # 이미지·영상 에셋 (현재 비어있음 — AI 생성 예정)
 └── docs/
     ├── overview.md         ← 이 파일
+    ├── running-locally.md  # 로컬 서버 실행 방법
     ├── scenes.md           # 각 씬 상세 구현 내용
     ├── todo-detail.md      # 추가 구현이 필요한 항목 정리
     └── ai-assets-guide.md  # AI 이미지·영상 생성 가이드
@@ -46,9 +47,7 @@ smoke-break-pomodoro/
 
 ## 실행 방법
 
-1. `smoke-break-pomodoro/` 폴더를 VS Code Live Server 또는 아무 HTTP 서버로 열기
-2. `index.html`을 브라우저에서 직접 열어도 동작함 (파일 프로토콜 허용)
-3. 모바일에서도 접근 가능 (반응형 대응)
+로컬 서버 실행 방법은 [running-locally.md](./running-locally.md) 참고 (서비스워커·마이크 기능 때문에 `file://` 직접 열기는 권장하지 않음).
 
 ---
 

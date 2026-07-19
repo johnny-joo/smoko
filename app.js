@@ -15,13 +15,13 @@ const state = {
   endTime: null,
 };
 
-// ── Cigarette Data ─────────────────────────────
+// ── Cigarette Data ───────────────────────────── (일부러 수정했음. 클로드 코드로 재수정 불가)
 const CIG_DATA = {
-  esse:    { name: '에쎄 체인지',     desc: '부드럽고 시원한 멘솔. 회사에서 이 정도면 충분해.', color: '#2ecc71' },
-  marlboro:{ name: '말보로 레드',     desc: '진한 풀바디. 스트레스받은 날엔 역시 이거지.',     color: '#e74c3c' },
-  raison:  { name: '레종 블루',       desc: '연하고 담백한 맛. 점심 식후엔 이게 최고.',         color: '#3498db' },
-  tobplus: { name: '토브플러스 아이스',desc: '강한 아이스로 머리가 맑아지는 느낌.',             color: '#00bcd4' },
-  lm:      { name: 'L&M 실버',        desc: '가볍고 깔끔한 흡연감. 부담 없이 즐기기 딱.',       color: '#aaa'    },
+  esse:    { name: '에쎄쎄 체인지',     desc: '부드럽고 시원한 멘솔. 회사에서 이 정도면 충분해.', color: '#2ecc71' },
+  marlboro:{ name: '말보로로 레드',     desc: '진한 풀바디. 스트레스받은 날엔 역시 이거지.',     color: '#e74c3c' },
+  raison:  { name: '리즌 블루',       desc: '연하고 담백한 맛. 점심 식후엔 이게 최고.',         color: '#3498db' },
+  tobplus: { name: '돈힐 아이스',desc: '강한 아이스로 머리가 맑아지는 느낌.',             color: '#00bcd4' },
+  lm:      { name: 'LLM 실버',        desc: '가볍고 깔끔한 흡연감. 부담 없이 즐기기 딱.',       color: '#aaa'    },
   bubble:  { name: '오늘의 특선',     desc: '미스터리한 선택. 오늘 하루도 고생했어.',           color: '#f39c12' },
 };
 
@@ -120,7 +120,7 @@ function stopAllSfx() {
 }
 
 // ── Scene Management ───────────────────────────
-const SCENES = ['scene-intro', 'scene-store', 'scene-elevator', 'scene-garden', 'scene-smoke', 'scene-ending'];
+const SCENES = ['scene-intro', 'scene-store', 'scene-elevator', 'scene-garden', 'scene-smoke', 'scene-ending', 'scene-office'];
 let currentScene = 'scene-intro';
 
 function goToScene(nextId) {
@@ -152,6 +152,7 @@ function onSceneEnter(sceneId) {
     case 'scene-garden':   initGarden();   break;
     case 'scene-smoke':    initSmoke();    break;
     case 'scene-ending':   initEnding();   break;
+    case 'scene-office':   initOffice();   break;
   }
 }
 
@@ -179,7 +180,7 @@ function initStore() {
 
   // reset staff recommendation bubble
   clearTimeout(staffBubbleTimeout);
-  $('#staff-bubble').classList.remove('show');
+  $('#staff-bubble')?.classList.remove('show');
 }
 
 // ── Staff Recommendation ───────────────────────
@@ -214,7 +215,7 @@ function staffRecommend() {
   if (navigator.vibrate) navigator.vibrate(20);
 }
 
-$('#staff-btn').addEventListener('click', staffRecommend);
+$('#staff-btn')?.addEventListener('click', staffRecommend);
 
 $$('.cig-card').forEach(card => {
   card.addEventListener('click', () => {
@@ -383,6 +384,7 @@ function initGarden() {
 let smokeParticles = [];
 let animFrame = null;
 let thoughtTimeout = null;
+let bossTimeout = null;
 
 // ── Background Switcher (‹ › 로 옥상/베이지/다 같이 피기 전환) ──
 const SMOKE_BACKGROUNDS = [
@@ -408,6 +410,7 @@ function initSmoke() {
   // reset state
   stopMic();
   stopExhaleHold();
+  resetBossPeek();
   applySmokeBg(0);
   const bubbleMode = isBubbleMode();
   state.timerRemaining = state.timerDuration;
@@ -462,6 +465,9 @@ function initSmoke() {
 
   // show first thought
   scheduleThought();
+
+  // 팀장 피하기 연출 시작
+  scheduleBossPeek();
 }
 
 function resizeCanvas(canvas) {
@@ -782,10 +788,54 @@ function scheduleThought() {
   }, delay);
 }
 
+// ── 팀장 피하기 ─────────────────────────────────
+// 실패도 페널티도 없는 코미디용 연출: 랜덤한 타이밍에 화면 위쪽 어딘가에서
+// 팀장이 잠깐 나타났다가, 항상 같은 구석으로 후다닥 숨는다.
+const BOSS_HIDE_SPOT = { left: '8%', top: '80%' };
+
+function resetBossPeek() {
+  clearTimeout(bossTimeout);
+  const boss = $('#boss-peek');
+  if (boss) boss.classList.remove('show', 'hiding');
+}
+
+function scheduleBossPeek() {
+  clearTimeout(bossTimeout);
+  const delay = 14000 + Math.random() * 16000; // 14~30초 랜덤
+  bossTimeout = setTimeout(() => {
+    if (currentScene === 'scene-smoke') triggerBossPeek();
+  }, delay);
+}
+
+function triggerBossPeek() {
+  const boss = $('#boss-peek');
+  if (!boss) return;
+
+  // 화면 위쪽 랜덤한 자리에서 슬쩍 등장
+  const peekLeft = 15 + Math.random() * 60; // 15~75%
+  boss.style.left = peekLeft + '%';
+  boss.style.top = '18%';
+  boss.classList.remove('hiding');
+  boss.classList.add('show');
+  if (navigator.vibrate) navigator.vibrate(15);
+
+  // 잠깐 보였다가 항상 같은 구석으로 후다닥 숨기
+  setTimeout(() => {
+    playSfx(SFX.walking);
+    boss.style.left = BOSS_HIDE_SPOT.left;
+    boss.style.top = BOSS_HIDE_SPOT.top;
+    boss.classList.remove('show');
+    boss.classList.add('hiding');
+  }, 700);
+
+  scheduleBossPeek();
+}
+
 // ── Skip Timer ─────────────────────────────────
 $('#btn-skip-timer').addEventListener('click', () => {
   if (state.timerInterval) clearInterval(state.timerInterval);
   clearTimeout(thoughtTimeout);
+  clearTimeout(bossTimeout);
   stopExhaleHold();
   goToScene('scene-ending');
 });
@@ -797,6 +847,7 @@ function initEnding() {
   state.endTime = Date.now();
   cancelAnimationFrame(animFrame);
   clearTimeout(thoughtTimeout);
+  clearTimeout(bossTimeout);
   stopMic();
   stopExhaleHold();
   stopAllSfx();
@@ -829,9 +880,75 @@ $('#btn-restart').addEventListener('click', () => {
 });
 
 $('#btn-back-work').addEventListener('click', () => {
-  // just close / go to blank tab behavior — minimal
-  window.location.reload();
+  goToScene('scene-office');
 });
+
+// ────────────────────────────────────────────────
+// SCENE 6: OFFICE — pick a focus session (25 / 50분)
+// ────────────────────────────────────────────────
+let focusInterval = null;
+let focusDuration = 25 * 60;
+let focusRemaining = 25 * 60;
+
+function initOffice() {
+  if (focusInterval) clearInterval(focusInterval);
+  focusInterval = null;
+  $('#focus-picker').style.display = 'flex';
+  $('#focus-timer-area').style.display = 'none';
+  $('#focus-done').style.display = 'none';
+}
+
+$$('.focus-option').forEach((btn) => {
+  btn.addEventListener('click', () => startFocusTimer(parseInt(btn.dataset.mins, 10)));
+});
+
+function startFocusTimer(mins) {
+  focusDuration = mins * 60;
+  focusRemaining = focusDuration;
+
+  $('#focus-picker').style.display = 'none';
+  $('#focus-done').style.display = 'none';
+  $('#focus-timer-area').style.display = 'flex';
+  $('#focus-timer-label').textContent = '집중하는 중...';
+  updateFocusDisplay();
+
+  if (focusInterval) clearInterval(focusInterval);
+  focusInterval = setInterval(() => {
+    focusRemaining--;
+    updateFocusDisplay();
+    if (focusRemaining <= 0) {
+      clearInterval(focusInterval);
+      focusInterval = null;
+      finishFocusTimer();
+    }
+  }, 1000);
+}
+
+function updateFocusDisplay() {
+  const m = Math.floor(focusRemaining / 60).toString().padStart(2, '0');
+  const s = (focusRemaining % 60).toString().padStart(2, '0');
+  $('#focus-timer-min').textContent = m;
+  $('#focus-timer-sec').textContent = s;
+
+  const TOTAL = 553; // 2π × 88, same ring geometry as the smoke timer
+  const elapsed = focusDuration - focusRemaining;
+  $('#focus-timer-circle').style.strokeDashoffset = (elapsed / focusDuration) * TOTAL;
+}
+
+function finishFocusTimer() {
+  $('#focus-timer-area').style.display = 'none';
+  $('#focus-done').style.display = 'flex';
+  $('#focus-done-sub').textContent = `${Math.round(focusDuration / 60)}분 동안 집중하셨어요. 잘하셨어요!`;
+}
+
+$('#btn-focus-stop').addEventListener('click', () => {
+  if (focusInterval) clearInterval(focusInterval);
+  focusInterval = null;
+  finishFocusTimer();
+});
+
+$('#btn-focus-restart').addEventListener('click', () => initOffice());
+$('#btn-focus-exit').addEventListener('click', () => window.location.reload());
 
 // ────────────────────────────────────────────────
 // GLOBAL: resize canvas on window resize

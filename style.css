@@ -3,6 +3,14 @@
    ================================================ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+@font-face {
+  font-family: 'Griun Fromsol';
+  src: url('fonts/Griun_Fromsol-Rg.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --bg-dark: #0d0d0d;
   --bg-card: #1a1a1a;
@@ -14,8 +22,8 @@
   --text: #f0ece4;
   --text-muted: #888;
   --border: #333;
-  --font-main: 'Noto Sans KR', sans-serif;
-  --font-display: 'Black Han Sans', sans-serif;
+  --font-main: 'Griun Fromsol', sans-serif;
+  --font-display: 'Griun Fromsol', sans-serif;
   --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
   /* light "storybook" theme used by intro / store / ending */
@@ -783,12 +791,14 @@ button, .cig-card, .lighter, .elev-btn, #soap-dip {
   padding: calc(1.5rem + env(safe-area-inset-top, 0px)) calc(1rem + env(safe-area-inset-right, 0px)) calc(1.5rem + env(safe-area-inset-bottom, 0px)) calc(1rem + env(safe-area-inset-left, 0px));
   justify-content: flex-start;
   transition: background 0.5s ease;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
-#scene-smoke.bg-rooftop { background: linear-gradient(180deg, #2b1f3d 0%, #3a2a4a 25%, #55345a 45%, #2a2035 70%, #0d0f14 100%); }
+#scene-smoke.bg-rooftop { background: linear-gradient(180deg, #6ec6e8 0%, #8ad9d6 32%, #cfe9c4 58%, #f3dfa0 80%, #f7c98a 100%); }
 #scene-smoke.bg-cream   { background: radial-gradient(ellipse at 50% 60%, var(--cream-panel-top) 0%, var(--bg-cream) 70%); }
 #scene-smoke.bg-friends { background: radial-gradient(ellipse at 50% 75%, #2a2418 0%, #14100a 70%); }
 
-/* ── "옥상 그대로" 배경: 노을 진 야경 옥상 일러스트 ─────── */
+/* ── "옥상 그대로" 배경: 화창한 낮 옥상 일러스트 ─────── */
 .smoke-rooftop-bg { display: none; position: absolute; inset: 0; overflow: hidden; }
 #scene-smoke.bg-rooftop .smoke-rooftop-bg { display: block; }
 
@@ -796,28 +806,14 @@ button, .cig-card, .lighter, .elev-btn, #soap-dip {
   position: absolute; top: 0; left: 0; right: 0; height: 68%;
   overflow: hidden;
 }
-.rooftop-sky .cloud { opacity: 0.22; filter: brightness(0.7); }
-.rooftop-moon {
+.rooftop-sky .cloud { opacity: 0.85; filter: brightness(1.05); }
+.rooftop-sun {
   position: absolute; top: 10%; right: 14%;
-  width: 46px; height: 46px; border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #fff9e6, #f5e6a8 60%, #e8d47a 100%);
-  box-shadow: 0 0 30px rgba(245,230,168,0.5);
+  width: 56px; height: 56px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fffbe8, #ffe27a 55%, #ffc94d 100%);
+  box-shadow: 0 0 40px rgba(255,210,110,0.7);
 }
-.star {
-  position: absolute;
-  width: 2px; height: 2px;
-  background: #fff;
-  border-radius: 50%;
-  opacity: 0.8;
-  animation: starTwinkle 3s ease-in-out infinite;
-}
-.star-1 { top: 10%; left: 15%; animation-delay: 0s; }
-.star-2 { top: 20%; left: 70%; animation-delay: 0.6s; }
-.star-3 { top: 8%;  left: 45%; animation-delay: 1.2s; }
-.star-4 { top: 30%; left: 85%; animation-delay: 1.8s; }
-.star-5 { top: 15%; left: 30%; animation-delay: 0.3s; }
-.star-6 { top: 25%; left: 58%; animation-delay: 2.1s; }
-@keyframes starTwinkle { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+.star { display: none; }
 
 .rooftop-skyline {
   position: absolute;
@@ -830,16 +826,16 @@ button, .cig-card, .lighter, .elev-btn, #soap-dip {
 }
 .building {
   flex: 1;
-  background: linear-gradient(180deg, #241f36 0%, #14111f 100%);
+  background: linear-gradient(180deg, #a7bfcd 0%, #8aa3b3 100%);
   border-radius: 1px 1px 0 0;
   position: relative;
 }
 .building::before {
   content: '';
   position: absolute; top: 16%; left: 18%; right: 18%; bottom: 20%;
-  background-image: radial-gradient(circle, rgba(255,205,120,0.55) 1px, transparent 1.6px);
+  background-image: radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1.6px);
   background-size: 7px 9px;
-  opacity: 0.75;
+  opacity: 0.8;
 }
 .b1 { height: 55%; } .b2 { height: 80%; } .b3 { height: 40%; }
 .b4 { height: 95%; } .b5 { height: 60%; } .b6 { height: 75%; }
@@ -847,7 +843,7 @@ button, .cig-card, .lighter, .elev-btn, #soap-dip {
 
 .rooftop-floor {
   position: absolute; bottom: 0; left: 0; right: 0; height: 30%;
-  background: linear-gradient(180deg, #171220 0%, #0a0710 100%);
+  background: linear-gradient(180deg, #ecdfc2 0%, #dcc89e 100%);
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -855,9 +851,19 @@ button, .cig-card, .lighter, .elev-btn, #soap-dip {
 }
 .rooftop-rail {
   position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.1);
 }
-.rooftop-plant { font-size: 1.8rem; opacity: 0.85; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
+.rooftop-plant { font-size: 1.8rem; opacity: 0.85; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.35)); }
+
+/* day sky is brighter than the old night gradient, so give the light-colored
+   text a touch of shadow to keep it readable */
+#scene-smoke.bg-rooftop .smoke-header h2,
+#scene-smoke.bg-rooftop .timer-label,
+#scene-smoke.bg-rooftop .timer-display,
+#scene-smoke.bg-rooftop .exhale-hint,
+#scene-smoke.bg-rooftop .thought-bubble p {
+  text-shadow: 0 1px 5px rgba(0,0,0,0.4);
+}
 
 /* light background needs dark text/UI to stay readable */
 #scene-smoke.bg-cream .smoke-header h2,
@@ -955,7 +961,7 @@ button, .cig-card, .lighter, .elev-btn, #soap-dip {
   display: none;
   position: absolute;
   left: 0; right: 0;
-  bottom: 8%;
+  bottom: 39%;
   justify-content: center;
   align-items: flex-end;
   gap: 1.2rem;
@@ -986,6 +992,7 @@ button, .cig-card, .lighter, .elev-btn, #soap-dip {
 .smoke-header {
   text-align: center;
   position: relative; z-index: 2;
+  margin-top: 2.2rem;
   margin-bottom: 1rem;
 }
 .smoke-header .scene-label { display: block; margin-bottom: 0.3rem; }
@@ -1215,4 +1222,164 @@ button, .cig-card, .lighter, .elev-btn, #soap-dip {
 .ending-msg { font-size: 0.9rem; color: var(--ink-muted); margin-bottom: 1.5rem; }
 .ending-buttons { display: flex; flex-direction: column; align-items: center; gap: 0.8rem; }
 #scene-ending .btn-sub { border-color: var(--cream-border); color: var(--ink-muted); }
+
+/* ================================================
+   RESPONSIVE: short phones (e.g. iPhone SE)
+   ================================================ */
+@media (max-height: 720px) {
+  .smoke-header { margin-top: 1.6rem; margin-bottom: 0.6rem; }
+  .timer-ring { width: 130px; height: 130px; }
+  .timer-area { margin-bottom: 0.6rem; }
+  .cig-burning-area { height: 130px; margin-bottom: 0.6rem; }
+  .thought-bubble { margin-top: 0.5rem; }
+  .smoke-controls { margin-top: 0.5rem; }
+}
 #scene-ending .btn-sub:hover { border-color: var(--ink-muted); color: var(--ink); }
+
+/* ================================================
+   SCENE 6: OFFICE — focus timer picker
+   ================================================ */
+#scene-office {
+  background: linear-gradient(180deg, #eae5da 0%, #d9d0bd 100%);
+  justify-content: flex-start;
+  padding: calc(2rem + env(safe-area-inset-top, 0px)) calc(1rem + env(safe-area-inset-right, 0px)) calc(1.5rem + env(safe-area-inset-bottom, 0px)) calc(1rem + env(safe-area-inset-left, 0px));
+}
+#scene-office .scene-label { color: var(--accent-ink); }
+#scene-office .scene-title { color: var(--ink); }
+#scene-office .scene-desc  { color: var(--ink-muted); }
+
+.office-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.office-partition {
+  position: absolute;
+  bottom: 0; left: 6%;
+  width: 38%; height: 56%;
+  background: linear-gradient(180deg, #cdc4ae 0%, #b6ab8c 100%);
+  border: 2px solid #a89b7d;
+  border-radius: 8px 8px 0 0;
+  box-shadow: inset 0 0 0 6px rgba(255,255,255,0.18);
+}
+.office-desk {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 24%;
+  background: linear-gradient(180deg, #b8895a 0%, #8f6339 100%);
+  box-shadow: 0 -2px 0 rgba(0,0,0,0.1) inset;
+}
+.office-laptop {
+  position: absolute;
+  bottom: 22%; left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+}
+.laptop-screen {
+  width: 104px; height: 68px;
+  margin: 0 auto;
+  background: linear-gradient(180deg, #555 0%, #2e2e2e 100%);
+  border: 3px solid #3f3f3f;
+  border-radius: 6px 6px 2px 2px;
+  display: flex; align-items: center; justify-content: center;
+}
+.laptop-glow {
+  width: 70%; height: 60%;
+  background: rgba(120,200,255,0.55);
+  border-radius: 4px;
+  filter: blur(2px);
+  animation: laptopFlicker 3s ease-in-out infinite;
+}
+@keyframes laptopFlicker { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
+.laptop-base {
+  width: 120px; height: 8px;
+  margin-top: 2px;
+  background: #4a4a4a;
+  border-radius: 0 0 6px 6px;
+}
+.office-plant { position: absolute; bottom: 24%; right: 12%; font-size: 2rem; }
+.office-cup   { position: absolute; bottom: 24%; left: 60%; font-size: 1.4rem; }
+
+.focus-picker {
+  position: relative; z-index: 2;
+  display: flex;
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+.focus-option {
+  background: rgba(255,255,255,0.75);
+  border: 2px solid transparent;
+  border-radius: 16px;
+  padding: 1.2rem 1.7rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  font-family: var(--font-main);
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.2s;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+}
+.focus-option:hover { transform: translateY(-3px); border-color: var(--accent); }
+.focus-option:active { transform: translateY(0); }
+.focus-option-num  { font-family: var(--font-display); font-size: 2rem; color: var(--accent-ink); line-height: 1; }
+.focus-option-unit { font-size: 0.8rem; color: var(--ink-muted); margin-top: 2px; }
+.focus-option-desc { font-size: 0.7rem; color: var(--ink-muted); margin-top: 4px; }
+
+.focus-timer-area {
+  display: none;
+  position: relative; z-index: 2;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.focus-timer-area .timer-bg-circle { stroke: rgba(51,48,42,0.12); }
+.focus-timer-area .timer-display   { color: var(--ink); }
+.focus-timer-area .timer-label     { color: var(--ink-muted); margin-top: 0; }
+#btn-focus-stop { border-color: var(--cream-border); color: var(--ink-muted); }
+#btn-focus-stop:hover { color: var(--ink); border-color: var(--wood); }
+
+.focus-done {
+  display: none;
+  position: relative; z-index: 2;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 3rem;
+}
+.focus-done .ending-sub { color: var(--ink-muted); }
+
+/* ================================================
+   "팀장 피하기" — 랜덤하게 잠깐 나타났다 구석으로 숨는 연출
+   (실패/페널티 없는 코미디용. images/boss.png 넣으면 이모지 대신 자동 표시됨)
+   ================================================ */
+.boss-peek {
+  position: absolute;
+  z-index: 4;
+  left: 50%; top: 18%;
+  width: 56px; height: 56px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.6);
+  transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1), top 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.25s, transform 0.25s;
+}
+.boss-peek.show {
+  opacity: 1;
+  transform: scale(1) rotate(-4deg);
+}
+.boss-peek.hiding {
+  opacity: 0;
+  transform: scale(0.5) rotate(-12deg);
+  transition: left 0.35s ease-in, top 0.35s ease-in,
+              opacity 0.3s ease-in 0.15s, transform 0.35s ease-in;
+}
+.boss-placeholder { filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); }
+.boss-img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+}

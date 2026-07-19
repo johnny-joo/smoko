@@ -1,7 +1,7 @@
 {
-  "name": "담배 피러가기",
-  "short_name": "담배피러가기",
-  "description": "10분간의 달콤한 현실 도피 — 스모크 브레이크 시뮬레이션",
+  "name": "Time for a smoko break!",
+  "short_name": "smoko break",
+  "description": "Catch your breath, take a smoko",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
